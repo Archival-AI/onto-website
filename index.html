@@ -171,10 +171,13 @@
 
   /* Collapsed state — show MENU text + icon */
   .menu .collapsed-stack{
-    display:none;
+    display:flex;
     flex-direction:column;align-items:center;gap:12px;
     padding-top:8px;
     cursor:pointer;
+    position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);
+    opacity:0;visibility:hidden;pointer-events:none;
+    transition:opacity .35s ease, visibility .35s ease;
   }
   .menu .collapsed-stack .lbl{
     font-size:12px;letter-spacing:.32em;text-transform:uppercase;
@@ -182,16 +185,21 @@
     font-family:var(--font);
   }
   .menu .collapsed-stack img{width:64px;height:auto;display:block;object-fit:contain;}
-  .app.collapsed .menu ol{display:none;}
-  /* show collapsed stack and center it vertically inside the nav */
-  .app.collapsed .menu .collapsed-stack{display:flex;position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);}
+  /* nav list — hide smoothly when collapsed */
+  .menu ol{
+    transition:opacity .35s ease, visibility .35s ease;
+  }
+  .app.collapsed .menu ol{opacity:0;visibility:hidden;pointer-events:none;}
+  /* show collapsed stack */
+  .app.collapsed .menu .collapsed-stack{opacity:1;visibility:visible;pointer-events:auto;}
   /* hide footer when collapsed */
-  .app.collapsed .menu .foot{display:none;}
+  .app.collapsed .menu .foot{opacity:0;visibility:hidden;pointer-events:none;}
 
   .menu .foot{
     margin-top:auto;font-size:11px;letter-spacing:.18em;
     text-transform:uppercase;color:var(--ink);
     display:flex;flex-direction:column;gap:14px;
+    transition:opacity .35s ease, visibility .35s ease;
   }
   .menu .socials{display:flex;gap:14px;}
   .menu .socials a{

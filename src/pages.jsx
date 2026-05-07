@@ -3,6 +3,17 @@ import React, { useState, useEffect, useRef } from 'react'
 import { WORDS, PORTFOLIO, BLOG, BLOG_TAGS, MANIFESTO, PRINCIPLES, TEAM, SERVICES } from './data'
 import ontoLogo from '../assets/onto-logo.png'
 
+// Portfolio project images
+import projNokia from '../assets/project_images/nokia_design_archive.png'
+import projTeoman from '../assets/project_images/Light-Games-circa-the-1960s-CTeoman-Madra-Collection.png'
+import projTuuma from '../assets/project_images/tuumalibotti.png'
+
+const PROJECT_IMGS = {
+  'nokia_design_archive.png': projNokia,
+  'Light-Games-circa-the-1960s-CTeoman-Madra-Collection.png': projTeoman,
+  'tuumalibotti.png': projTuuma,
+}
+
 /* "onto" rendered in Druk Wide Bold */
 function Onto() {
   return <strong className="onto-brand">onto</strong>;
@@ -164,7 +175,9 @@ export function Portfolio() {
             className={`work-row ${open === i ? 'open' : ''}`}
             onClick={() => setOpen(open === i ? null : i)}
           >
-            <div className="wnum">{String(i + 1).padStart(2, '0')}</div>
+            <div className="wthumb">
+              <img src={PROJECT_IMGS[w.img]} alt={w.title} className="wthumb-img" />
+            </div>
             <div className="wtitle">{w.title}</div>
             <div className="wpartner">{w.partner}</div>
             <div className="wyear">{w.year}</div>

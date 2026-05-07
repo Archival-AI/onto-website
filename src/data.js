@@ -48,6 +48,7 @@ export const PORTFOLIO = [
     year: '2025',
     desc: `A publicly accessible digital portal developed at Aalto University's Department of Design, built from materials donated by Microsoft Mobile Oy and Nokia designers. The source archive comprises 20,000+ entries and ~950GB of files spanning the mid-1990s to 2017. Lù Chén prototyped interactive visualisations in 2023 and continued web development in 2024; the portal launched in January 2025. Remediates archival material into accessible knowledge through interactive visualisations.`,
     tags: ['Archive', 'Visualisation', 'Research'],
+    img: 'nokia_design_archive.png',
   },
   {
     title: 'Teoman Madra Archive',
@@ -55,6 +56,7 @@ export const PORTFOLIO = [
     year: '2021-2025',
     desc: 'An ongoing conservation and digitisation effort to rescue and organise the multimedia oeuvre of Teoman Madra, a pioneer of Turkish media art (1960s–2000s). Begüm Çelik & Selçuk Artut retrieved scattered materials, stabilised fragile carriers, and began systematic digitisation and cataloguing of slides, negatives, VHS/Betamax/miniDV tapes, optical media, and drives. Descriptions follow museum-grade standards (CDWA/CCO).',
     tags: ['Archive', 'Conservation', 'Cataloguing'],
+    img: 'Light-Games-circa-the-1960s-CTeoman-Madra-Collection.png',
   },
   {
     title: 'Tuumailubotti',
@@ -62,6 +64,7 @@ export const PORTFOLIO = [
     year: '2024',
     desc: 'An experimental conversational AI exploring how a chatbot might represent neurodiverse rhetoric rather than defaulting to neuronormative styles. Built on Finnish FinGPT-3 models for native-level Finnish proficiency; evaluated with 31 participants. The curated dataset was released openly. Tuumailubotti blends HR support, design research and local-language AI to ask how conversational systems can better include neurodivergent ways of communicating.',
     tags: ['AI', 'Research', 'Language'],
+    img: 'tuumalibotti.png',
   },
 ];
 

@@ -102,7 +102,7 @@
     position:relative;height:100vh;width:100vw;
     display:grid;
     grid-template-columns: var(--menu-w, 240px) 1fr;
-    transition:grid-template-columns .55s cubic-bezier(.7,.05,.25,1);
+    transition:grid-template-columns .3s cubic-bezier(.7,.05,.25,1);
   }
   .app.collapsed{ --menu-w: 96px; }
 
@@ -123,7 +123,8 @@
     backdrop-filter:none;
     -webkit-backdrop-filter:none;
     display:flex;flex-direction:column;
-    transition:padding .45s cubic-bezier(.7,.05,.25,1), background .35s;
+    overflow:hidden;
+    transition:padding .3s cubic-bezier(.7,.05,.25,1), background .35s;
   }
   .app.collapsed .menu{padding:64px 0 32px 0; align-items:center;}
   .menu ol{list-style:none;display:flex;flex-direction:column;gap:2px;}
@@ -171,13 +172,10 @@
 
   /* Collapsed state — show MENU text + icon */
   .menu .collapsed-stack{
-    display:flex;
+    display:none;
     flex-direction:column;align-items:center;gap:12px;
     padding-top:8px;
     cursor:pointer;
-    position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);
-    opacity:0;visibility:hidden;pointer-events:none;
-    transition:opacity .35s ease, visibility .35s ease;
   }
   .menu .collapsed-stack .lbl{
     font-size:12px;letter-spacing:.32em;text-transform:uppercase;
@@ -185,21 +183,17 @@
     font-family:var(--font);
   }
   .menu .collapsed-stack img{width:64px;height:auto;display:block;object-fit:contain;}
-  /* nav list — hide smoothly when collapsed */
-  .menu ol{
-    transition:opacity .35s ease, visibility .35s ease;
-  }
-  .app.collapsed .menu ol{opacity:0;visibility:hidden;pointer-events:none;}
-  /* show collapsed stack */
-  .app.collapsed .menu .collapsed-stack{opacity:1;visibility:visible;pointer-events:auto;}
+  .app.collapsed .menu ol{display:none;}
+  /* show collapsed stack and center it vertically inside the nav */
+  .app.collapsed .menu .collapsed-stack{display:flex;position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);}
   /* hide footer when collapsed */
-  .app.collapsed .menu .foot{opacity:0;visibility:hidden;pointer-events:none;}
+  .app.collapsed .menu .foot{display:none;}
 
   .menu .foot{
     margin-top:auto;font-size:11px;letter-spacing:.18em;
     text-transform:uppercase;color:var(--ink);
     display:flex;flex-direction:column;gap:14px;
-    transition:opacity .35s ease, visibility .35s ease;
+    white-space:nowrap;
   }
   .menu .socials{display:flex;gap:14px;}
   .menu .socials a{
@@ -358,9 +352,9 @@
   .portfolio-list{display:flex;flex-direction:column;border-top:1px solid var(--rule);}
   .work-row{
     display:grid;
-    grid-template-columns: 80px 1.4fr 1fr 90px;
+    grid-template-columns: 88px 1.4fr 1fr 90px;
     gap:24px;
-    padding:28px 8px;
+    padding:20px 8px;
     border-bottom:1px solid var(--rule);
     align-items:center;
     cursor:pointer;
@@ -368,7 +362,16 @@
     transition:background .25s;
   }
   .work-row:hover{background:rgba(255,255,255,.45);}
-  .work-row .wnum{font-size:12px;opacity:.5;}
+  .work-row .wthumb{
+    width:88px;height:88px;border-radius:14px;
+    border:1px solid var(--rule);
+    overflow:hidden;flex-shrink:0;
+    background:linear-gradient(135deg,#ffd5ee,#ffeaf6 60%,#ffffff);
+  }
+  .work-row .wthumb-img{
+    width:100%;height:100%;object-fit:cover;object-position:center;
+    display:block;border-radius:14px;
+  }
   .work-row .wtitle{font-size:30px;letter-spacing:-0.02em;}
   .work-row .wpartner{font-size:13px;opacity:.65;}
   .work-row .wyear{font-size:13px;opacity:.55;text-align:right;}

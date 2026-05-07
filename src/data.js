@@ -121,21 +121,21 @@ export const TEAM = [
     role: 'Designer & Web Developer, Archive Researcher',
     bio: 'Turkish artist, creative technologist, and researcher. Holds an M.A. in Visual Arts & Visual Communication Design from Sabancı University, alongside a B.Sc. in Computer Science & Engineering with a minor in Art Theory & Criticism. Co-founder of metr.cube, an independent art initiative based in Istanbul, and a creative technologist at Ekho Collective.',
     link: 'https://www.linkedin.com/in/begum-celik/',
-    img: '/assets/portraits/BegümCelik_Linkedin_2025.jpeg',
+    img: '/assets/portraits/begum_photo.jpg',
   },
   {
     name: 'Lù Chén',
     role: 'UX Designer & Participatory Design Researcher',
     bio: 'Helsinki-based design researcher and media artist combining data visualisation, physical computing, and co-design with inquiries into migration, sustainability politics, and feminist techno-science studies.',
     link: 'https://www.linkedin.com/in/lù-chén-43177191/',
-    img: '/assets/portraits/lu-photo_JPG.jpeg',
+    img: '/assets/portraits/lu_photo.jpeg',
   },
   {
     name: 'Vertti Luostarinen',
     role: 'AI Researcher & Developer',
     bio: 'Finnish media artist, developer and AI researcher. Holds an MA in New Media from Aalto University. Multidisciplinary practice at the intersection of artistic research, media, and technology. Works as an AI researcher with Alma Media and Yle News Lab; part of Ekho Collective.',
     link: 'https://www.linkedin.com/in/vertti-luostarinen-b31012155/',
-    img: '/assets/portraits/vertti.jpg',
+    img: '/assets/portraits/vertti_photo.jpg',
   },
 ];
 

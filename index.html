@@ -580,9 +580,10 @@
 
   /* Contact details */
   .contact-details{
-    display:grid;grid-template-columns:1fr 1fr;gap:48px;
+    display:grid;grid-template-columns:1fr 1fr 1fr;gap:48px;
     padding-top:8px;
   }
+  @media (max-width:900px){.contact-details{grid-template-columns:1fr 1fr;}}
   @media (max-width:700px){.contact-details{grid-template-columns:1fr;}}
   .contact-col{display:flex;flex-direction:column;}
   .contact-item{display:flex;flex-direction:column;gap:10px;}
@@ -595,16 +596,7 @@
     position:relative;
     white-space:nowrap;
   }
-  .contact-email-link::after{
-    content:"";
-    position:absolute;left:0;bottom:-2px;
-    width:100%;height:1px;
-    background:var(--ink);
-    transform:scaleX(0);
-    transform-origin:left center;
-    transition:transform .42s cubic-bezier(.7,.05,.25,1);
-  }
-  .contact-email-link:hover::after{ transform:scaleX(1); }
+
 
   /* Underscore squish */
   .squishable{transform:translate3d(0,0,0);}

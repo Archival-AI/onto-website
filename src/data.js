@@ -5,7 +5,7 @@ export const NAV = [
  // { id: 'archival',  label: 'Archival AI',          external: 'https://archivalai.onto.fi' },
   { id: 'bel',       label: 'Beyond Easy Language',  external: 'https://bel.onto.fi' },
   { id: 'portfolio', label: 'Portfolio',             },
-  { id: 'blog',      label: 'Blog',                 },
+//  { id: 'blog',      label: 'Blog',                 },
   { id: 'manifesto', label: 'Manifesto',             },
   { id: 'about',     label: 'About Us',              },
   { id: 'contact',   label: 'Contact',              },

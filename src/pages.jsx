@@ -298,7 +298,7 @@ export function Contact() {
     <div className="page" data-screen-label="08 Contact">
       <div className="page-eyebrow">Contact</div>
 
-      {/* Services bento grid */}
+      {/* Services bento grid 
       <div className="services-bento">
         {SERVICES.map(s => (
           <div className={`service-card service-${s.size}`} key={s.title}>
@@ -320,8 +320,8 @@ export function Contact() {
           </div>
         ))}
       </div>
-
-      {/* Newsletter banner — tagline top-aligned with form */}
+*/}
+      {/* Newsletter banner — tagline top-aligned with form 
       <div className="newsletter-banner">
         <div className="nl-left">
           <p className="nl-tagline">From chaos<br />to clarity.</p>
@@ -351,13 +351,13 @@ export function Contact() {
           )}
         </div>
       </div>
-
+*/}
       {/* Contact details */}
       <div className="contact-details">
         <div className="contact-col">
           <div className="contact-item">
             <span className="contact-label">Email</span>
-            <a href="mailto:hello@onto.fi" className="contact-value contact-email-link">hello@onto.fi</a>
+            <p className="contact-value contact-email-link">[firstname]@onto.fi</p>
           </div>
         </div>
         <div className="contact-col">
@@ -367,6 +367,15 @@ export function Contact() {
               c/o Helsinki Think Company Kumpula<br />
               Pietari Kalmin katu 5<br />
               00560 Helsinki
+            </address>
+          </div>
+        </div>
+        <div className="contact-col">
+          <div className="contact-item">
+            <span className="contact-label">Business Info</span>
+            <address className="contact-value contact-address">
+              Dasein AI Oy<br />
+              VAT-number: 3612377-4
             </address>
           </div>
         </div>

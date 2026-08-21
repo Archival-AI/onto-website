@@ -147,9 +147,7 @@ export function Home({ tweaks }) {
         </h1>
 
         <p className="hero-sub">
-          A media lab of artist–developers building AI tools and experiences for archives,
-          accessibility, and the spaces between. From chaos to clarity with humans in
-          the loop.
+          A media lab at the intersection of art, archives and artificial intelligence.
         </p>
 
       </div>
@@ -265,9 +263,10 @@ export function About() {
       <div className="page-eyebrow">About Us</div>
       <h1 className="page-title">Our Story</h1>
       <div className="about-body">
-        <p><Onto /> was founded by three artist–developers working at the intersection of media art, archiving, and artificial intelligence. Coming from both artistic and technical backgrounds, our team builds tools and experiences that connect creative practice with structured data.</p>
+        <p>Founded by three artist-developers, <Onto /> builds tools and experiences that connect creative practice with structured data.</p>
         <p>We work across commercial and artistic projects, from AI-driven archive systems to interactive installations. Having collaborated on numerous joint exhibitions and research projects, we bring an interdisciplinary mindset to every partnership.</p>
         <p>Thanks to this hybrid background, <Onto /> can design and deliver projects that span technology, culture, and design. We're always open to new collaborations with brands, institutions, and studios that share a curiosity for meaningful, data-driven storytelling.</p>
+        <p>Based in Helsinki & Ankara.</p>
       </div>
       <div className="team">
         {TEAM.map(p => (

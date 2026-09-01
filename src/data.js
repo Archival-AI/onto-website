@@ -46,25 +46,38 @@ export const PORTFOLIO = [
     title: 'Nokia Design Archive',
     partner: 'Nokia Design Archive & Aalto University',
     year: '2025',
+    contributors: ['Lù Chén'],
     desc: `A publicly accessible digital portal developed at Aalto University's Department of Design, built from materials donated by Microsoft Mobile Oy and Nokia designers. The source archive comprises 20,000+ entries and ~950GB of files spanning the mid-1990s to 2017. Lù Chén prototyped interactive visualisations in 2023 and continued web development in 2024; the portal launched in January 2025. Remediates archival material into accessible knowledge through interactive visualisations.`,
     tags: ['Archive', 'Visualisation', 'Research'],
     img: 'nokia_design_archive.png',
+    links: [
+      { label: 'Website', url: 'https://nokiadesignarchive.aalto.fi/' },
+      { label: 'Research', url: 'https://aaltodoc.aalto.fi/items/ea5943dc-f19c-4811-9fb5-790dbd3e51da' },
+    ],
   },
   {
     title: 'Teoman Madra Archive',
     partner: 'Sabancı University & Madra Family',
     year: '2021-2025',
+    contributors: ['Begüm Çelik'],
     desc: 'An ongoing conservation and digitisation effort to rescue and organise the multimedia oeuvre of Teoman Madra, a pioneer of Turkish media art (1960s–2000s). Begüm Çelik & Selçuk Artut retrieved scattered materials, stabilised fragile carriers, and began systematic digitisation and cataloguing of slides, negatives, VHS/Betamax/miniDV tapes, optical media, and drives. Descriptions follow museum-grade standards (CDWA/CCO).',
     tags: ['Archive', 'Conservation', 'Cataloguing'],
     img: 'Light-Games-circa-the-1960s-CTeoman-Madra-Collection.png',
+    links: [
+      { label: 'Research', url: 'https://research.sabanciuniv.edu/id/eprint/50987/' },
+    ],
   },
   {
     title: 'Tuumailubotti',
     partner: 'A Large Finnish Media Company',
     year: '2024',
+    contributors: ['Begüm Çelik', 'Vertti Luostarinen'],
     desc: 'An experimental conversational AI exploring how a chatbot might represent neurodiverse rhetoric rather than defaulting to neuronormative styles. Built on Finnish FinGPT-3 models for native-level Finnish proficiency; evaluated with 31 participants. The curated dataset was released openly. Tuumailubotti blends HR support, design research and local-language AI to ask how conversational systems can better include neurodivergent ways of communicating.',
     tags: ['AI', 'Research', 'Language'],
     img: 'tuumalibotti.png',
+    links: [
+      { label: 'Research', url: 'https://aaltodoc.aalto.fi/items/78ee8740-eed2-4be9-8171-42ecb603ecad' },
+    ],
   },
 ];
 
@@ -119,8 +132,10 @@ export const TEAM = [
   {
     name: 'Begüm Çelik',
     role: 'Designer & Web Developer, Archive Researcher',
-    bio: 'Turkish artist, creative technologist, and researcher. Holds an M.A. in Visual Arts & Visual Communication Design from Sabancı University, alongside a B.Sc. in Computer Science & Engineering with a minor in Art Theory & Criticism. Co-founder of metr.cube, an independent art initiative based in Istanbul, and a creative technologist at Ekho Collective.',
+    bio: 'Media artist, creative technologist, and archive researcher. Holds an M.A. in Visual Arts & Visual Communication Design from Sabancı University, alongside a B.Sc. in Computer Science & Engineering with a minor in Art Theory & Criticism. Co-founder of metr.cube, an independent art initiative based in Istanbul, and a creative technologist at Ekho Collective.',
     link: 'https://www.linkedin.com/in/begum-celik/',
+    web: 'https://www.begumcelik.org',
+    mail: 'mailto:begum@onto.fi',
     img: '/assets/portraits/begum_photo.jpg',
   },
   {
@@ -128,6 +143,8 @@ export const TEAM = [
     role: 'UX Designer & Participatory Design Researcher',
     bio: 'Helsinki-based design researcher and media artist combining data visualisation, physical computing, and co-design with inquiries into migration, sustainability politics, and feminist techno-science studies.',
     link: 'https://www.linkedin.com/in/lù-chén-43177191/',
+    web: 'https://l-lu-u.github.io/',
+    mail: 'mailto:lu@onto.fi',
     img: '/assets/portraits/lu_photo.jpeg',
   },
   {
@@ -135,6 +152,8 @@ export const TEAM = [
     role: 'AI Researcher & Developer',
     bio: 'Finnish media artist, developer and AI researcher. Holds an MA in New Media from Aalto University. Multidisciplinary practice at the intersection of artistic research, media, and technology. Works as an AI researcher with Alma Media and Yle News Lab; part of Ekho Collective.',
     link: 'https://www.linkedin.com/in/vertti-luostarinen-b31012155/',
+    web: 'https://vertti.eu/',
+    mail: 'mailto:vertti@onto.fi',
     img: '/assets/portraits/vertti_photo.jpg',
   },
 ];

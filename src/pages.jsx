@@ -2,6 +2,7 @@
 import React, { useState, useEffect, useRef } from 'react'
 import { WORDS, PORTFOLIO, BLOG, BLOG_TAGS, MANIFESTO, PRINCIPLES, TEAM, SERVICES } from './data'
 import ontoLogo from '../assets/onto-logo.png'
+import belReportPdf from '../assets/bel/BEL-Industry-Report.pdf'
 
 // Portfolio project images
 import projNokia from '../assets/project_images/nokia_design_archive.png'
@@ -359,8 +360,161 @@ export function Portfolio() {
         </div>
       ) : (
         <p className="page-lede" style={{ opacity: .6 }}>
-          Our featured projects have moved to the <a href="#about">About Us</a> page. More case studies coming soon.
+           More case studies coming soon.
         </p>
+      )}
+    </div>
+  );
+}
+
+const BEL_STATS = [
+  { num: '13', label: 'Finnish learners co-designed and tested the prototype' },
+  { num: '4', label: 'Reading levels per article: A2, B1, B2 and the original' },
+  { num: '2', label: 'Weeks of diary-based testing on a real news platform' },
+  { num: '8', label: 'Easy-language news platforms benchmarked across 3 languages' },
+];
+
+const BEL_FINDINGS = [
+  { text: <><strong>Readers compared levels as a strategy</strong> starting at B2, dropping to A2 when confused, escalating to the original when something felt off. Choice itself lowered the threshold for reading in Finnish.</> },
+  { text: <><strong>The original is the ground truth.</strong> One-click access to the standard article built trust. Readers switched to it whenever a simplification felt strange or unclear.</> },
+  { text: <><strong>On-demand explanations were hit-or-miss</strong> Strong on vocabulary, weak on cultural context the article itself doesn't carry. Readers asked for translations, grammar notes and saved-word review.</> },
+];
+
+function BelReportButton({ onClick, variant = 'solid', children }) {
+  return (
+    <button className={`bel-btn ${variant}`} onClick={onClick} type="button">
+      {children}
+    </button>
+  );
+}
+
+export function BEL() {
+  const [pdfOpen, setPdfOpen] = useState(false);
+  return (
+    <div className="page" data-screen-label="BEL Project">
+      <div className="page-eyebrow">Project · Research</div>
+      <h1 className="page-title">Beyond Easy Language</h1>
+      <p className="page-lede">
+        Designing AI-simplified Easy Finnish News with Immigrant L2 Learners
+      </p>
+
+      <div className="bel-tags">
+        <span className="bel-tag">In Collaboration with Keskisuomalainen Oyj</span>
+        <span className="bel-tag">Funded by Media Industry Research Foundation of Finland</span>
+        <span className="bel-tag">Jan – Jul 2026</span>
+      </div>
+
+      <div className="bel-cta">
+        <BelReportButton variant="solid" onClick={() => setPdfOpen(true)}>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8"><path d="M1.5 12s3.8-7 10.5-7 10.5 7 10.5 7-3.8 7-10.5 7S1.5 12 1.5 12z"/><circle cx="12" cy="12" r="3"/></svg>
+          View the report
+        </BelReportButton>
+        <a className="bel-btn outline" href={belReportPdf} download="BEL Industry Report.pdf">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8"><path d="M12 3v13"/><polyline points="6,11 12,17 18,11"/><path d="M4 21h16"/></svg>
+          Download PDF
+        </a>
+      </div>
+
+      <div className="bel-stats">
+        {BEL_STATS.map((s) => (
+          <div className="bel-stat" key={s.label}>
+            <div className="bel-stat-num">{s.num}</div>
+            <div className="bel-stat-label">{s.label}</div>
+          </div>
+        ))}
+      </div>
+
+      <div className="bel-cols">
+        <div>
+          <span className="bel-eyebrow">The Problem</span>
+          <h2 className="bel-h2">Easy news stops helping right when learners need it most</h2>
+          <p className="bel-p">
+            Easy Finnish serves roughly 11–14% of Finland's population, but for language learners only during a short
+            window, between A2 and B1. Beyond that, easy news feels too simple while standard news is still too hard.
+            Readers land in a limbo with no format made for them.
+          </p>
+        </div>
+        <div>
+          <span className="bel-eyebrow">The Idea</span>
+          <h2 className="bel-h2">Make difficulty a control held by the reader</h2>
+          <p className="bel-p">
+            Working with university students learning Finnish, we built two AI features into the real reading
+            environment of Helsingin Uutiset. So every article can meet the reader at their level, with the
+            original always one tap away.
+          </p>
+        </div>
+      </div>
+
+      <span className="bel-eyebrow">What we built</span>
+      <div className="bel-cards">
+        <div className="bel-card">
+          <div className="bel-pill-row">
+            <span className="bel-pill tone-1">A2</span>
+            <span className="bel-pill tone-2">B1</span>
+            <span className="bel-pill tone-3">B2</span>
+            <span className="bel-pill tone-4">Original</span>
+          </div>
+          <h3>The level selector</h3>
+          <p className="bel-p" style={{ fontSize: 15 }}>
+            Every article in four versions, three generated by an LLM and checked against 40 official Easy Finnish
+            criteria. Shared paragraph structure lets readers hop between levels or to the original without
+            losing their place.
+          </p>
+        </div>
+        <div className="bel-card">
+          <div className="bel-highlight-demo">
+            Suomen <mark>eduskunta päätti</mark> uudesta laista…
+            <span className="bel-gloss">→ "eduskunta päätti" = the parliament decided (past tense)</span>
+          </div>
+          <h3>The highlighter</h3>
+          <p className="bel-p" style={{ fontSize: 15 }}>
+            Select any word, phrase or paragraph and get an explanation tuned to your proficiency level such as grammar,
+            vocabulary or content, with the full article as context.
+          </p>
+        </div>
+      </div>
+
+      <span className="bel-eyebrow">What we found</span>
+      <div className="bel-findings">
+        {BEL_FINDINGS.map((f, i) => (
+          <div key={i}>
+            <div className="bel-finding-bar" />
+            <p className="bel-p" style={{ fontSize: 15.5 }}>{f.text}</p>
+          </div>
+        ))}
+      </div>
+
+      <div className="bel-callout-ring">
+        <div className="bel-callout">
+          <span className="bel-eyebrow">For newsrooms</span>
+          <p>
+            Cover real current issues, not just "immigrant topics". Simplify everything, keep it free, and always
+            keep the original one tap away. Above all: give readers control over the simplification.
+          </p>
+        </div>
+      </div>
+
+      <div className="bel-footer">
+        <p>Begüm Çelik · Lù Chén · Vertti Luostarinen. The full research paper is forthcoming. <br></br>Report licensed under CC BY 4.0.</p>
+        <div className="bel-footer-actions">
+          <BelReportButton variant="outline" onClick={() => setPdfOpen(true)}>View report</BelReportButton>
+          <a className="bel-btn solid" href={belReportPdf} download="BEL Industry Report.pdf">Download PDF</a>
+        </div>
+      </div>
+
+      {pdfOpen && (
+        <div className="bel-modal-overlay" onClick={() => setPdfOpen(false)}>
+          <div className="bel-modal" onClick={(e) => e.stopPropagation()}>
+            <div className="bel-modal-head">
+              <span>BEL Industry Report — PDF</span>
+              <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+                <a className="bel-btn solid" style={{ padding: '7px 16px', fontSize: 12.5 }} href={belReportPdf} download="BEL Industry Report.pdf">Download</a>
+                <button className="bel-modal-close" title="Close" onClick={() => setPdfOpen(false)}>✕</button>
+              </div>
+            </div>
+            <iframe src={belReportPdf} title="BEL Industry Report" style={{ flex: 1, border: 'none', width: '100%' }} />
+          </div>
+        </div>
       )}
     </div>
   );

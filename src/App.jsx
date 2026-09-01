@@ -2,7 +2,7 @@
 import React, { useState } from 'react'
 import { NAV } from './data'
 import { useTweaks, TweaksPanel, TweakSection, TweakRadio } from './tweaks-panel'
-import { Home, Portfolio, Blog, Manifesto, About, Contact } from './pages'
+import { Home, Portfolio, Blog, Manifesto, About, Contact, BEL } from './pages'
 import ontoLogo from '../assets/onto-logo.png'
 import iconOutline from '../assets/Icon-Outline-Black.png'
 
@@ -37,6 +37,7 @@ export default function App() {
   const renderPage = (id) => {
     switch (id) {
       case 'home':      return <Home tweaks={t} />
+      case 'bel':       return <BEL />
       case 'portfolio': return <Portfolio />
       case 'blog':      return <Blog />
       case 'manifesto': return <Manifesto />

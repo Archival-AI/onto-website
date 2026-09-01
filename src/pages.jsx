@@ -375,7 +375,7 @@ export function Contact() {
             <span className="contact-label">Business Info</span>
             <address className="contact-value contact-address">
               Dasein AI Oy<br />
-              VAT-number: 3612377-4
+              Business ID [Y-tunnus]: 3612377-4
             </address>
           </div>
         </div>

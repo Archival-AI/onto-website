@@ -136,7 +136,7 @@ export const TEAM = [
     link: 'https://www.linkedin.com/in/begum-celik/',
     web: 'https://www.begumcelik.org',
     mail: 'mailto:begum@onto.fi',
-    img: '/assets/portraits/begum_photo.jpg',
+    img: './assets/portraits/begum_photo.jpg',
   },
   {
     name: 'Lù Chén',
@@ -145,7 +145,7 @@ export const TEAM = [
     link: 'https://www.linkedin.com/in/lù-chén-43177191/',
     web: 'https://l-lu-u.github.io/',
     mail: 'mailto:lu@onto.fi',
-    img: '/assets/portraits/lu_photo.jpeg',
+    img: './assets/portraits/lu_photo.jpeg',
   },
   {
     name: 'Vertti Luostarinen',
@@ -154,7 +154,7 @@ export const TEAM = [
     link: 'https://www.linkedin.com/in/vertti-luostarinen-b31012155/',
     web: 'https://vertti.eu/',
     mail: 'mailto:vertti@onto.fi',
-    img: '/assets/portraits/vertti_photo.jpg',
+    img: './assets/portraits/vertti_photo.jpg',
   },
 ];
 

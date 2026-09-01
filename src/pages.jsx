@@ -1,8 +1,9 @@
 // Pages — Home + inner pages
 import React, { useState, useEffect, useRef } from 'react'
-import { WORDS, PORTFOLIO, BLOG, BLOG_TAGS, MANIFESTO, PRINCIPLES, TEAM, SERVICES } from './data'
+import { WORDS, PORTFOLIO, BLOG, BLOG_TAGS, TEAM, SERVICES } from './data'
 import ontoLogo from '../assets/onto-logo.png'
 import belReportPdf from '../assets/bel/BEL-Industry-Report.pdf'
+import luPhoto from '../assets/portraits/lu_photo.jpeg'
 
 // Portfolio project images
 import projNokia from '../assets/project_images/nokia_design_archive.png'
@@ -405,14 +406,15 @@ export function BEL() {
       </div>
 
       <div className="bel-cta">
-        <BelReportButton variant="solid" onClick={() => setPdfOpen(true)}>
+        <BelReportButton variant="solid" onClick={() => setPdfOpen(false)}>
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8"><path d="M1.5 12s3.8-7 10.5-7 10.5 7 10.5 7-3.8 7-10.5 7S1.5 12 1.5 12z"/><circle cx="12" cy="12" r="3"/></svg>
-          View the report
+          View report
         </BelReportButton>
+        {/*
         <a className="bel-btn outline" href={belReportPdf} download="BEL Industry Report.pdf">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8"><path d="M12 3v13"/><polyline points="6,11 12,17 18,11"/><path d="M4 21h16"/></svg>
           Download PDF
-        </a>
+        </a> */}
       </div>
 
       <div className="bel-stats">
@@ -497,8 +499,8 @@ export function BEL() {
       <div className="bel-footer">
         <p>Begüm Çelik · Lù Chén · Vertti Luostarinen. The full research paper is forthcoming. <br></br>Report licensed under CC BY 4.0.</p>
         <div className="bel-footer-actions">
-          <BelReportButton variant="outline" onClick={() => setPdfOpen(true)}>View report</BelReportButton>
-          <a className="bel-btn solid" href={belReportPdf} download="BEL Industry Report.pdf">Download PDF</a>
+          <BelReportButton variant="outline" onClick={() => setPdfOpen(false)}>View report</BelReportButton>
+          {/*<a className="bel-btn solid" href={belReportPdf} download="BEL Industry Report.pdf">Download PDF</a>*/}
         </div>
       </div>
 
@@ -564,27 +566,188 @@ export function Blog() {
   );
 }
 
+function LuNote({ children, note }) {
+  return (
+    <span className="lu-note" tabIndex={0}>
+      {children}
+      <span className="lu-pop">
+        <span className="lu-pop-head">
+          <span className="lu-pop-avatar" style={{ backgroundImage: `url(${luPhoto})` }} />
+          <span className="lu-pop-tag">/// Lù</span>
+        </span>
+        <span className="lu-pop-text">{note}</span>
+      </span>
+    </span>
+  );
+}
+
+const MANIFESTO_TENETS = [
+  {
+    num: '0',
+    lead: 'The Critical AI Engineer considers Artificial Intelligence to be the most transformative language of our time, shaping the way we move, communicate and think. It is the work of the Critical Engineer to study and exploit this language, exposing its influence.',
+    body: (
+      <>
+        <p>It feels like a good starting point to answer why we should choose to engage with such a problematic technology in the first place. Personally, the justification is that AI is, for better or for worse, "the most transformative language of our time", and we can still influence how it will be developed in the future. As the ones implementing it, we have the most ethical responsibility, but also agency in how it will affect the lives of others.</p>
+        <p>
+          AI has now become ubiquitous infrastructure that is an inescapable part of society. There is no going back to a post-AI world. AI engineers hold power over how people write, speak and discover information. We should be mindful of our responsibility while embracing the discursive disruption it can create.{' '}
+          <LuNote note={<>It feels like we can play a masking game, substituting "Artificial Intelligence" with many other things, many other "languages": be it AI, Engineering, Design Thinking… at one point, Movable Type Printing, at one point, knotting. There lies a cliché about technological developments. And what has been transformed within these waves of technological changes?</>}>
+            AI has the power to both uplift and crush vulnerable communities, and to even resurrect or extinguish entire languages.
+          </LuNote>
+        </p>
+      </>
+    ),
+  },
+  {
+    num: '1',
+    lead: 'The Critical AI Engineer considers any technology depended upon to be both a challenge and a threat. The greater the dependence on an AI model, the greater the need to study and expose its inner workings, regardless of ownership or legal provision.',
+    body: (
+      <>
+        <p>I personally believe that foundation models currently present the largest threat to the existence of humanity, and therefore do not belong in closed labs. With their ongoing involvement in the genocide in Gaza, all of the leading US AI labs have shown their willingness to sidestep all of their commitments to so-called 'AI safety'.</p>
+        <p>Because calls for an AI cease-fire are utopian, we need to take action to remedy the current power imbalance between closed and open-source AI. In practice, this means investing in public AI initiatives and projects that aim to democratize the training and inference of frontier models. While boycotting closed AI labs is quite inconsequential, the everyday choices of which AI providers we choose to trust do carry some weight.</p>
+      </>
+    ),
+  },
+  {
+    num: '2',
+    lead: 'The Critical AI Engineer raises awareness that with each technological advance our techno-political literacy is challenged.',
+    body: (
+      <>
+        <p>As Critical AI Engineers, we should contribute more to the public discourse on AI ethics and reject both techno-utopian and faux-critical blanket statements about AI. As practitioners at the forefront of AI adoption, I feel we should be part of defining the ruleset we work within. In a nutshell, we should educate the public more.</p>
+        <p>AI has become such a polarised topic that it is very hard to have a nuanced conversation about topics such as the environmental toll of data centers or the replacement of human labor. The job of the critical AI engineer is to weigh the ethical consequences of specific AI use cases where the reality is often more complex than simple binary options. The choice of not using AI also has an opportunity cost attached to it.</p>
+      </>
+    ),
+  },
+  {
+    num: '3',
+    lead: 'The Critical AI Engineer deconstructs and incites suspicion of rich user experiences.',
+    body: (
+      <>
+        <p>As knowledge is increasingly accessed through conversational interfaces, we should pay close attention to how these interfaces talk to us. We should look beyond the customer-service-worker-meets-omniscient-godlike-entity personas of mainstream chat assistants, and ask what other types of personas we could design.</p>
+        <p>AI assistants hallucinate, yet are often designed to appear deceptively lucid. Interfaces of all kinds often mask the messy uncertainness of the underlying systems, exploiting and eroding user trust. Why not visualize bias and detect hallucinations in the interface itself, or if nothing else, create designs that look and feel as unstable as the AI behind it?</p>
+      </>
+    ),
+  },
+  {
+    num: '4',
+    lead: 'The Critical AI Engineer looks beyond the "awe of implementation" to determine methods of influence and their specific effects.',
+    body: (
+      <p>As many organizations still seem to be in the "let's just do something, anything with AI" phase, consultancies sell proof-of-concepts of unfeasible or irresponsible pipe dreams, without clearly outlining the real-world consequences of these systems. As critical AI engineers, our job should be to say either "no, this should not be done with AI" or "no, this should in fact not be done at all" around 80% of the time. The only way to actually serve our clients and to also maintain our own credibility is to resist the allure of projects that have no other goal than technical innovation.</p>
+    ),
+  },
+  {
+    num: '5',
+    lead: "The Critical AI Engineer recognises that each work of AI engineering engineers its user, proportional to that user's dependency upon it.",
+    body: (
+      <p>AI systems can sometimes improve the accessibility of information or services, but the tradeoffs need to be considered carefully. Often, "accessibility gains" are taken for granted and thought of as emerging automatically as a result of the interactivity and customizability of generative AI technologies. In reality, we are often merely supplanting a set of assumptions about the user with another set of assumptions. We need to know we are actually gaining something meaningful when we are giving away control to systems that are known to be misaligned, persuasive and biased. To assess these gains, we need to involve users during the design process.</p>
+    ),
+  },
+  {
+    num: '6',
+    lead: 'The Critical AI Engineer expands "machine" to describe interrelationships encompassing devices, bodies, agents, forces and networks.',
+    body: (
+      <>
+        <p>The word "agent" resonates differently in the AI age than it did when the manifesto was originally written. AI agents can empower individuals by allowing them to automate, augment and redesign their daily tasks. But their disruptive potential is often wasted when agents are used to simply replicate existing workflows. As a result, many AI agents become 'human-assisted technology' that still need workers to act as secretaries and overseers.</p>
+        <p>
+          One of the main reasons for these issues is the overreliance on quick technical POC's that don't consider the complexity of the socio-technical assemblages these systems will be integrated in. Fully understanding this "machine" often takes a lot of time, money and patience, things people commissioning POC's often lack.{' '}
+          <LuNote note={<>Technological systems are often engineered with promises of empowerment and convenience. "Let's automate tasks that are too dangerous or tedious for humans," so claimed marketing campaigns. In reality, many technical solutions do not eliminate the danger or tedium in human labour; rather, they relocate these labours and sometimes midwife new forms of dangerous or tedious work. While "empowerment" and "convenience" are staged for some upon the interfaces, the labour of mining, labelling, and manufacturing happens backstage. To critically engineer AI, we have to scrutinise these claims of labour emancipation with patience. In <em>More Work for Mother</em>, Ruth Schwartz Cowan examined class and gender disparities through the ironies of household technologies. (…)</>}>
+            This also contributes to a wider problem known as 'POC purgatory', where the POC is so far removed from reality that it does not serve its purpose of proving a concept.
+          </LuNote>
+        </p>
+      </>
+    ),
+  },
+  {
+    num: '7',
+    lead: 'The Critical AI Engineer observes the space between the production and consumption of technology. Acting rapidly to changes in this space, the Critical AI Engineer serves to expose moments of imbalance and deception.',
+    body: (
+      <>
+        <p>Many problems of today's AI systems can be mitigated with better engineering, and good engineering takes time. Carbon footprint and data sovereignty issues can be reduced by optimizing AI models for edge devices and local hardware. Bias can be reduced with evaluations. The issues related to data extractivism and third-world labor can be circumvented by relying on truly open-source models that are not as smart, and therefore take more work to implement.</p>
+        <p>We should do whatever we can to resist the war economy of AI that insists we iterate as quickly as possible, use the best models possible and vibe-code using as many tokens as possible. The best way to do this is to engineer systems that act as proof that there are alternative ways of doing things. The Māori transcription tool Kaituhi is a good practical example of what this can look like.</p>
+      </>
+    ),
+  },
+  {
+    num: '8',
+    lead: 'The Critical AI Engineer looks to the history of art, architecture, activism, philosophy and invention and finds exemplary works of Critical Engineering. Strategies, ideas and agendas from these disciplines will be adopted, re-purposed and deployed.',
+    body: (
+      <p>One of the main reasons why I chose to become an AI engineer is because it allows me to put concepts from Foucault and other thinkers into practice. Thinking about epistemological questions such as "what is the difference between oversimplification and hallucination" are not some musings during coffee breaks, but an integral part of the work itself. AI engineering sometimes resembles practice-based research in the sense that these theoretical assumptions need to be put to the test in the real world.</p>
+    ),
+  },
+  {
+    num: '9',
+    lead: 'The Critical AI Engineer notes that AI models expand into social and psychological realms, regulating behaviour between people and the machines they interact with. By understanding this, the Critical AI Engineer seeks to reconstruct user-constraints and social action through means of digital excavation.',
+    body: (
+      <>
+        <p>The data the AI models are trained on establishes the boundaries on what the model can do. We need better tools to excavate the training data that has been fed into LLMs, and to understand how that influences their behavior. While all kinds of experimental interpretability tools already exist, none of them are supported via APIs. This is yet another argument for using local models.</p>
+        <p>Many of the bias-related problems regarded as "inherent" to the technology can be mitigated with better AI engineering. While bias cannot be eliminated completely, AI engineers can at least measure and quantify its effects. Many of the most egregious cases of so-called "AI bias" are actually just due to humans in charge of these projects being biased against evaluations.</p>
+      </>
+    ),
+  },
+  {
+    num: '10',
+    lead: 'The Critical AI Engineer considers the exploit to be the most desirable form of exposure.',
+    body: (
+      <>
+        <p>The study of LLM capabilities is quite practice-driven, and mostly consists of researchers trying out different prompts. Exposing exploits and vulnerabilities involves coming up with creative narratives that will trick the model into misbehaving. The field of AI safety would advance a lot quicker if they involved more artists.</p>
+        <p>The exploits we discover can serve as empirical proof against the doomsday narrative deployed by the AI industry. And fighting that narrative is important, as I sense that we are already conforming to having those kinds of problems current LLM systems can solve, instead of creating LLM systems that would solve our actual problems.</p>
+      </>
+    ),
+  },
+];
+
+const MANIFESTO_FINAL = [
+  'The Critical AI Engineer recognizes AI as the most transformative language of our time. They accept that the power to engineer language carries a profound ethical responsibility; they exert their agency to ensure these technologies uplift rather than erase vulnerable communities, protecting the survival of diverse linguistic and social identities.',
+  'The Critical AI Engineer considers the concentration of frontier models within private labs a threat to collective security. They act to dismantle this power imbalance by prioritizing the democratization of training and inference infrastructure, shifting material trust away from closed ecosystems toward public and open-source intelligence.',
+  'The Critical AI Engineer rejects the polarization of techno-utopianism and faux-criticality, choosing instead to provide the public with the technical nuance required to navigate complex ethical trade-offs.',
+  'The Critical AI Engineer rejects the deceptive lucidity of the "omniscient assistant" persona, recognizing it as a mask for systemic uncertainty and bias. They design interfaces that provide a legible mapping of an AI\'s instability.',
+  'The Critical AI Engineer resists the "innovation at all costs" mandate, recognizing that technical feasibility does not grant ethical or functional legitimacy.',
+  'The Critical AI Engineer views "accessibility gains" through generative AI not as an inherent byproduct of the technology, but as a site of rigorous trade-off. They mandate the direct involvement of users throughout the design process to ensure that accessibility is an empirical outcome rather than a speculative marketing claim.',
+  "The Critical AI Engineer distinguishes between true augmentation and the mere replication of existing workflows through \"human-assisted technology.\" They demand the time, capital, and patience necessary to move beyond the superficial automation of tasks, ensuring that agents empower individuals rather than burdening them with the hidden labor of overseeing fragile systems.",
+  'The Critical AI Engineer resists the "war economy" of AI, characterized by reckless iteration speeds and excessive token consumption, by championing intentional, sovereign engineering. They prove through material implementation that ethical alternatives to data extractivism and labor exploitation are both possible and necessary.',
+  'The Critical AI Engineer views AI engineering as a form of practice-based research, where theoretical and epistemological inquiry is an integral requirement. They recognize that concepts such as power, discourse, and knowledge-production are not abstract musings but the very material being engineered.',
+  'The Critical AI Engineer recognizes that bias is often a failure of engineering rigor rather than a technological inevitability. They commit to quantifying and measuring algorithmic prejudice, viewing the refusal to conduct thorough evaluations not as a technical oversight, but as an intentional projection of human bias.',
+  'The Critical AI Engineer recognizes that defining the boundaries of AI capability is a creative and practice-driven endeavor. By operating in novel, non-standard domains where models are most prone to collapse, the Critical AI Engineer ensures that society does not conform to the limitations of current LLMs, but instead demands the engineering of systems that address actual human needs.',
+];
+
 export function Manifesto() {
   return (
     <div className="page" data-screen-label="Manifesto">
-      <div className="page-eyebrow">Manifesto</div>
-      <h1 className="page-title">Company Values</h1>
-      <div className="col-2">
-        <div className="manifesto">
-          {MANIFESTO.map((p, i) => <p key={i}>{p}</p>)}
-        </div>
-        <div>
-          <div className="principles">
-            {PRINCIPLES.map(p => (
-              <div className="p" key={p.num}>
-                <div className="num">{p.num}</div>
-                <div className="ph">{p.h}</div>
-                <div className="pb">{p.b}</div>
-              </div>
-            ))}
+      <div className="page-eyebrow">Our Values</div>
+      <h1 className="page-title">The Critical AI Engineering Manifesto</h1>
+      <p className="man-byline">By Vertti Luostarinen · annotated by Lù Chén</p>
+      <p className="man-hint">
+        <span className="man-hint-avatar" style={{ backgroundImage: `url(${luPhoto})` }} />
+        Hover the green-marked passages to read Lù's margin notes.
+      </p>
+
+      <div className="man-intro">
+        <p>The <a href="https://criticalengineering.org" target="_blank" rel="noreferrer">critical engineering manifesto</a> was originally published in 2011 by a group of three artists/engineers: Julian Oliver, Gordan Savičić and Danja Vasiliev. Although the manifesto is quite old at this point, it has lost none of its relevance, and I thought it would be a good starting point for defining my position as an AI engineer in this day and age, and when needed, to update it to the changed AI landscape.</p>
+        <p>Like all good manifestos, the critical engineering manifesto raises more questions than it answers. The main question left open is the role of the engineer. The manifesto regards engineering more as a methodology for artists engaging in 'hacktivist' interventions. Engineers are responsible for building the infrastructure that designers and artists operate within. The focus on engineering, therefore, places an emphasis on foundational systems rather than individual projects. Rather than hacking existing systems, it proposes building new ones.</p>
+        <p>Even though my job title is 'AI engineer', I see no clear difference between art, research, design and engineering. All four are needed to successfully complete a project. Writing prompts is an art, empirical evaluations and reviewing existing literature is research, understanding the needs of your stakeholders is design, and building the software architecture is engineering. It also needs to be noted that my work with AI mostly concerns LLMs, and to a lesser extent, computer vision.</p>
+        <p>As an AI engineer, I have yet to see a single AI policy paper or ethical framework that had any bearing on my day-to-day work, so I need to create one for myself. In this text, my goal is to reinterpret the tenets of the critical engineering manifesto, and define what they mean to me in practice. Then, I distill these observations into a new manifesto, the Critical AI Engineering Manifesto.</p>
+      </div>
+
+      {MANIFESTO_TENETS.map((t) => (
+        <React.Fragment key={t.num}>
+          <div className="man-tenet">
+            <div className="man-tenet-num">{t.num}</div>
+            <p className="man-tenet-lead">{t.lead}</p>
           </div>
+          <div className="man-tenet-body">{t.body}</div>
+        </React.Fragment>
+      ))}
+
+      <div className="man-callout-ring">
+        <div className="man-callout">
+          <span className="man-callout-eyebrow">The Manifesto</span>
+          <h2>A Reverse-engineered Critical AI Engineering Manifesto</h2>
+          <ol start="0">
+            {MANIFESTO_FINAL.map((line, i) => <li key={i}>{line}</li>)}
+          </ol>
         </div>
       </div>
+
+      <p className="man-footnote">Written by Vertti Luostarinen. Margin notes by Lù Chén. After <em>The Critical Engineering Manifesto</em> (Oliver, Savičić &amp; Vasiliev, 2011).</p>
     </div>
   );
 }

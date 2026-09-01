@@ -566,17 +566,69 @@
     background:rgba(0,0,0,.06);color:var(--ink-soft);
   }
 
-  /* Manifesto */
-  .manifesto{max-width:62ch;}
-  .manifesto p{font-size:22px;line-height:1.5;margin-bottom:24px;color:var(--ink-soft);}
-  .manifesto p::first-line{color:var(--ink);}
-  .principles{display:grid;grid-template-columns:repeat(3,1fr);gap:32px;margin-top:64px;}
-  @media (max-width:900px){.principles{grid-template-columns:1fr;}}
-  .principles .p{
-    border-top:1px solid var(--ink);padding-top:18px;
+  /* Manifesto page */
+  .man-byline{font-size:16px;color:var(--ink-soft);margin:0 0 8px;}
+  .man-hint{
+    font-size:13px;color:var(--ink-soft);opacity:.75;
+    display:flex;align-items:center;gap:8px;margin:0 0 48px;
   }
-  .principles .p .num{font-size:11px;letter-spacing:.25em;opacity:.6;margin-bottom:12px;}
-  .principles .p .ph{font-size:24px;letter-spacing:-0.01em;margin-bottom:8px;}
+  .man-hint-avatar{
+    display:inline-block;width:22px;height:22px;border-radius:50%;
+    background-size:cover;background-position:center top;filter:grayscale(1);flex-shrink:0;
+  }
+  .man-intro p{font-size:16.5px;line-height:1.8;color:var(--ink-soft);margin:0 0 24px;max-width:none;}
+  .man-intro p:last-child{margin-bottom:54px;}
+
+  .man-tenet{display:flex;gap:18px;margin:0 0 18px;}
+  .man-tenet-num{
+    flex-shrink:0;width:52px;font-size:34px;font-weight:600;letter-spacing:-0.02em;
+    background:linear-gradient(135deg,var(--pink),#8e8e9c);
+    -webkit-background-clip:text;background-clip:text;color:transparent;
+  }
+  .man-tenet-lead{margin:4px 0 0;font-size:17px;line-height:1.65;font-weight:600;color:var(--ink);}
+  .man-tenet-body{margin:0 0 54px 70px;font-size:15.5px;line-height:1.8;color:var(--ink-soft);max-width:none;}
+  .man-tenet-body p{margin:0 0 20px;}
+  .man-tenet-body p:last-child{margin-bottom:0;}
+  @media (max-width:700px){.man-tenet-body{margin-left:0;}}
+
+  /* Lù's margin notes — highlighted with her green */
+  .lu-note{
+    background:linear-gradient(transparent 62%, rgba(141,255,176,0.55) 62%);
+    cursor:help;position:relative;
+  }
+  .lu-note:hover .lu-pop,.lu-note:focus .lu-pop{opacity:1;visibility:visible;transform:translateY(0);}
+  .lu-pop{
+    position:absolute;right:0;left:auto;bottom:calc(100% + 12px);
+    width:min(340px,74vw);background:#fff;border:1.5px solid #8dffb0;border-radius:14px;
+    padding:14px 16px;box-shadow:0 18px 44px rgba(20,90,45,0.25);
+    opacity:0;visibility:hidden;transform:translateY(6px);transition:all .22s ease;
+    z-index:20;font-style:normal;font-weight:400;cursor:default;
+  }
+  .lu-pop-head{display:flex;align-items:center;gap:8px;margin-bottom:8px;}
+  .lu-pop-avatar{
+    display:inline-block;width:26px;height:26px;border-radius:50%;
+    background-size:cover;background-position:center top;flex-shrink:0;
+  }
+  .lu-pop-tag{font-size:12px;font-weight:700;letter-spacing:.08em;color:#3fa869;}
+  .lu-pop-text{display:block;font-size:13px;line-height:1.65;color:#213b28;}
+
+  .man-callout-ring{
+    border-radius:24px;padding:2px;
+    background:conic-gradient(from var(--ma) at 50% 50%,#d9d9e2,#ffffff 14%,#f6a6db 28%,#a9a9b8 44%,#fce2f3 58%,#8e8e9c 72%,#ffffff 86%,#d9d9e2);
+    animation:maspin 8s linear infinite;
+    box-shadow:0 26px 60px rgba(120,40,90,0.18);
+  }
+  .man-callout{border-radius:22px;background:var(--ink);padding:44px clamp(24px,5vw,52px);}
+  .man-callout-eyebrow{font-size:12px;letter-spacing:.32em;text-transform:uppercase;font-weight:700;color:#f6a6db;}
+  .man-callout h2{
+    margin:14px 0 30px;font-size:clamp(22px,2.6vw,30px);font-weight:500;
+    letter-spacing:-.02em;color:#fdf3fa;line-height:1.25;
+  }
+  .man-callout ol{margin:0;padding:0 0 0 26px;display:flex;flex-direction:column;gap:20px;}
+  .man-callout li{font-size:16.5px;line-height:1.75;font-weight:600;color:#f0dcea;}
+
+  .man-footnote{margin:40px 0 0;font-size:13.5px;color:var(--ink-soft);line-height:1.6;}
+
 
   /* About */
   .about-page{ padding-top:0 !important; padding-bottom:0 !important; }

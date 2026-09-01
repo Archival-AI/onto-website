@@ -25,107 +25,198 @@ function Onto() {
   return <strong className="onto-brand">onto</strong>;
 }
 
-/* ─────────────────── Morphing wordmark ─────────────────── */
-// True text morph: outgoing word slides up and fades while incoming word
-// rises into place from below, both clipped within the same line.
-function MorphWord({ words, index, onClick }) {
-  const [shown, setShown] = useState(words[index]);
-  const [incoming, setIncoming] = useState(null);
+/* ─────────────────── Particle logo (canvas, built from the real PNG) ─────────────────── */
+function ParticleLogo({ src, onMeasure }) {
+  const canvasRef = useRef(null);
 
   useEffect(() => {
-    if (words[index] === shown) return;
-    setIncoming(words[index]);
-    const t1 = setTimeout(() => {
-      setShown(words[index]);
-      setIncoming(null);
-    }, 520);
-    return () => clearTimeout(t1);
-  }, [index, words, shown]);
+    const cv = canvasRef.current;
+    if (!cv) return;
+    let alive = true;
+    let raf = null;
+    const ctx = cv.getContext('2d');
+    let W = 0, H = 0, dpr = 1;
+    let parts = [];
+    const gap = 6;
+    const repelR = 90;
 
-  const widthSizer = incoming
-    ? (shown.length > incoming.length ? shown : incoming)
-    : shown;
+    const img = new Image();
+    img.decoding = 'async';
 
-  return (
-    <span
-      className="word"
-      onClick={onClick}
-      style={{ display:'inline-block', position:'relative', overflow:'hidden', verticalAlign:'baseline', color:'#111', fontWeight:600, fontSize: '0.32em' }}
-    >
-      {/* invisible sizer keeps width stable */}
-      <span style={{ visibility:'hidden', display:'inline-block' }}>{widthSizer}</span>
-      {/* outgoing */}
-      <span
-        key={`out-${shown}`}
-        style={{
-          position:'absolute', left:0, top:0, whiteSpace:'nowrap',
-          transform: incoming ? 'translateY(-100%)' : 'translateY(0)',
-          opacity: incoming ? 0 : 1,
-          filter: incoming ? 'blur(3px)' : 'blur(0)',
-          transition: 'transform .52s cubic-bezier(.7,0,.2,1), opacity .42s ease, filter .42s',
-        }}
-      >{shown}</span>
-      {/* incoming */}
-      {incoming && (
-        <span
-          key={`in-${incoming}`}
-          style={{
-            position:'absolute', left:0, top:0, whiteSpace:'nowrap',
-            transform:'translateY(0)',
-            opacity:1, filter:'blur(0)',
-            animation:'morphIn .52s cubic-bezier(.7,0,.2,1) both',
-          }}
-        >{incoming}</span>
-      )}
-      <style>{`
-        @keyframes morphIn {
-          0%   { transform: translateY(100%); opacity: 0; filter: blur(3px); }
-          60%  { opacity: 1; filter: blur(0); }
-          100% { transform: translateY(0);    opacity: 1; filter: blur(0); }
+    const build = () => {
+      dpr = Math.min(2, window.devicePixelRatio || 1);
+      W = cv.clientWidth; H = cv.clientHeight;
+      if (!W || !H || !img.naturalWidth || !img.naturalHeight) return;
+      cv.width = W * dpr; cv.height = H * dpr;
+
+      const off = document.createElement('canvas');
+      off.width = W; off.height = H;
+      const o = off.getContext('2d');
+
+      const iw = img.naturalWidth, ih = img.naturalHeight;
+      const scale = Math.min(W / iw, H / ih) * 0.94;
+      const dw = iw * scale, dh = ih * scale;
+      const dx = (W - dw) / 2, dy = (H - dh) / 2;
+      o.drawImage(img, dx, dy, dw, dh);
+
+      const data = o.getImageData(0, 0, W, H).data;
+      const next = [];
+      // Track, per-column, the vertical extent of opaque pixels so we can
+      // locate the thin horizontal underscore/bar to the right of the
+      // letterforms (bar/dot columns are much "thinner" than letter columns).
+      const colMinY = new Array(W).fill(-1);
+      const colMaxY = new Array(W).fill(-1);
+      for (let y = 0; y < H; y += 1) {
+        for (let x = 0; x < W; x += 1) {
+          if (data[(y * W + x) * 4 + 3] > 128) {
+            if (colMinY[x] === -1) colMinY[x] = y;
+            colMaxY[x] = y;
+          }
         }
-      `}</style>
-    </span>
-  );
+      }
+      for (let y = 0; y < H; y += gap) {
+        for (let x = 0; x < W; x += gap) {
+          if (data[(y * W + x) * 4 + 3] > 128) {
+            next.push({ x: Math.random() * W, y: Math.random() * H, vx: 0, vy: 0, tx: x, ty: y });
+          }
+        }
+      }
+      parts = next;
+
+      if (onMeasure) {
+        const extents = [];
+        let maxExtent = 0;
+        for (let x = 0; x < W; x++) {
+          if (colMinY[x] !== -1) {
+            const ext = colMaxY[x] - colMinY[x];
+            extents.push({ x: x + (colMinY[x]/9), ext, top: colMinY[x], bottom: colMaxY[x] });
+            if (ext > maxExtent) maxExtent = ext;
+          }
+        }
+        const thinThresh = maxExtent * 0.3;
+        // find contiguous runs of "thin" columns, keep the widest run
+        // (that's the bar; the dot forms a much shorter run)
+        let bestRun = null, curRun = null;
+        for (let i = 0; i < extents.length; i++) {
+          const e = extents[i];
+          const isThin = e.ext > 0 && e.ext < thinThresh;
+          const contiguous = curRun && e.x - curRun.endX <= gap * 1.5;
+          if (isThin && contiguous) {
+            curRun.endX = e.x;
+            curRun.tops.push(e.top); curRun.bottoms.push(e.bottom);
+          } else if (isThin) {
+            curRun = { startX: e.x, endX: e.x, tops: [e.top], bottoms: [e.bottom] };
+          } else {
+            curRun = null;
+          }
+          if (curRun) {
+            const width = curRun.endX - curRun.startX;
+            if (!bestRun || width > (bestRun.endX - bestRun.startX)) bestRun = curRun;
+          }
+        }
+        if (bestRun && (bestRun.endX - bestRun.startX) > gap * 4) {
+          const avg = (arr) => arr.reduce((a, b) => a + b, 0) / arr.length;
+          onMeasure({
+            left: bestRun.startX,
+            right: bestRun.endX,
+            top: avg(bestRun.tops),
+            bottom: avg(bestRun.bottoms),
+            canvasW: W,
+            canvasH: H,
+          });
+        } else {
+          onMeasure(null);
+        }
+      }
+    };
+
+    img.onload = () => build();
+    img.src = src;
+
+    const onResize = () => build();
+    window.addEventListener('resize', onResize);
+
+    let mouse = null;
+    const onMove = (e) => {
+      const r = cv.getBoundingClientRect();
+      mouse = { x: e.clientX - r.left, y: e.clientY - r.top };
+    };
+    const onLeave = () => { mouse = null; };
+    cv.addEventListener('pointermove', onMove);
+    cv.addEventListener('pointerleave', onLeave);
+
+    const tick = () => {
+      if (!alive) return;
+      if (W && H) {
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+        ctx.clearRect(0, 0, W, H);
+        ctx.fillStyle = '#141216';
+        const r2 = repelR * repelR;
+        for (const p of parts) {
+          p.vx += (p.tx - p.x) * 0.025;
+          p.vy += (p.ty - p.y) * 0.025;
+          if (mouse) {
+            const dx = p.x - mouse.x, dy = p.y - mouse.y, d2 = dx * dx + dy * dy;
+            if (d2 < r2 && d2 > 0.01) {
+              const d = Math.sqrt(d2), f = ((repelR - d) / repelR) * 3.2;
+              p.vx += (dx / d) * f;
+              p.vy += (dy / d) * f;
+            }
+          }
+          p.vx *= 0.86; p.vy *= 0.86;
+          p.x += p.vx; p.y += p.vy;
+          ctx.beginPath();
+          ctx.arc(p.x, p.y, gap * 0.42, 0, Math.PI * 2);
+          ctx.fill();
+        }
+      }
+      raf = requestAnimationFrame(tick);
+    };
+    tick();
+
+    return () => {
+      alive = false;
+      cancelAnimationFrame(raf);
+      window.removeEventListener('resize', onResize);
+      cv.removeEventListener('pointermove', onMove);
+      cv.removeEventListener('pointerleave', onLeave);
+    };
+  }, [src]);
+
+  return <canvas ref={canvasRef} className="particle-canvas" />;
+}
+
+/* ─────────────────── Typewriter effect ─────────────────── */
+function useTypewriter(words) {
+  const [text, setText] = useState('');
+  useEffect(() => {
+    let alive = true;
+    let timeoutId = null;
+    let wi = 0, ci = 0, deleting = false;
+    const tick = () => {
+      if (!alive) return;
+      const w = words[wi];
+      let delay;
+      if (!deleting) {
+        ci++; delay = 110;
+        if (ci === w.length) { deleting = true; delay = 1600; }
+      } else {
+        ci--; delay = 55;
+        if (ci === 0) { deleting = false; wi = (wi + 1) % words.length; delay = 500; }
+      }
+      setText(words[wi].slice(0, ci));
+      timeoutId = setTimeout(tick, delay);
+    };
+    tick();
+    return () => { alive = false; clearTimeout(timeoutId); };
+  }, [words]);
+  return text;
 }
 
 /* ─────────────────── Home ─────────────────── */
 export function Home({ tweaks }) {
-  const [wordIdx, setWordIdx] = useState(0);
-  const wrapRef = useRef(null);
-  const lastSwap = useRef(0);
-  const trigger = tweaks.trigger || 'hover';
-
-  useEffect(() => {
-    if (trigger !== 'auto') return;
-    const id = setInterval(() => {
-      setWordIdx(i => (i + 1) % WORDS.length);
-    }, 2400);
-    return () => clearInterval(id);
-  }, [trigger]);
-
-  useEffect(() => {
-    const wrap = wrapRef.current;
-    if (!wrap) return;
-    const onMove = (e) => {
-      const r = wrap.getBoundingClientRect();
-      const cx = r.left + r.width / 2;
-      const cy = r.top  + r.height / 2;
-      const dx = e.clientX - cx;
-      const dy = e.clientY - cy;
-      const dist = Math.hypot(dx, dy);
-      const radius = Math.max(r.width, r.height) * 0.9;
-      const strength = Math.max(0, 1 - dist / radius);
-      if (trigger === 'hover' && strength > 0.45) {
-        const now = performance.now();
-        if (now - lastSwap.current > 900) {
-          lastSwap.current = now;
-          setWordIdx(i => (i + 1) % WORDS.length);
-        }
-      }
-    };
-    window.addEventListener('mousemove', onMove);
-    return () => window.removeEventListener('mousemove', onMove);
-  }, [trigger]);
+  const twText = useTypewriter(WORDS);
+  const [barRect, setBarRect] = useState(null);
 
   const variantClasses = [
     tweaks.typeScale === 'monumental' ? 'type-monumental'
@@ -134,20 +225,26 @@ export function Home({ tweaks }) {
       : tweaks.logoTreatment === 'mark' ? 'logo-inline-mark' : '',
   ].join(' ');
 
+  // Position the typewriter using the bar's real measured geometry so it
+  // always sits just above the underscore, regardless of container size.
+  const twStyle = barRect
+    ? {
+        left: `${barRect.left}px`,
+        bottom: `${barRect.canvasH - barRect.top + 4}px`,
+        right: 'auto',
+      }
+    : undefined;
+
   return (
     <div className={`page home in ${variantClasses}`} data-screen-label="01 Home">
       <div className="home-inner">
 
         <h1 className="hero">
           <span className="we">we are</span>
-          <span className="onto-wrap" ref={wrapRef}>
-            <img className="onto-img" src={ontoLogo} alt="onto_." />
-            <span className="slot">
-              <MorphWord
-                words={WORDS}
-                index={wordIdx}
-                onClick={() => setWordIdx(i => (i + 1) % WORDS.length)}
-              />
+          <span className="particle-wrap">
+            <ParticleLogo src={ontoLogo} onMeasure={setBarRect} />
+            <span className="typewriter" style={twStyle}>
+              <span className="tw-text">{twText}<span className="tw-caret" /></span>
             </span>
           </span>
         </h1>
@@ -392,115 +489,107 @@ function BelReportButton({ onClick, variant = 'solid', children }) {
 export function BEL() {
   const [pdfOpen, setPdfOpen] = useState(false);
   return (
-    <div className="page" data-screen-label="BEL Project">
-      <div className="page-eyebrow">Project · Research</div>
-      <h1 className="page-title">Beyond Easy Language</h1>
-      <p className="page-lede">
-        Designing AI-simplified Easy Finnish News with Immigrant L2 Learners
-      </p>
+    <div className="page bel-page" data-screen-label="BEL Project">
+      <div className="bel-hero">
+        <div className="page-eyebrow">Current Research</div>
+        <h1 className="page-title">Beyond Easy Language</h1>
+        <p className="page-lede">
+          Designing AI-simplified Easy Finnish News with Immigrant L2 Learners
+        </p>
 
-      <div className="bel-tags">
-        <span className="bel-tag">In Collaboration with Keskisuomalainen Oyj</span>
-        <span className="bel-tag">Funded by Media Industry Research Foundation of Finland</span>
-        <span className="bel-tag">Jan – Jul 2026</span>
-      </div>
-
-      <div className="bel-cta">
-        <BelReportButton variant="solid" onClick={() => setPdfOpen(false)}>
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8"><path d="M1.5 12s3.8-7 10.5-7 10.5 7 10.5 7-3.8 7-10.5 7S1.5 12 1.5 12z"/><circle cx="12" cy="12" r="3"/></svg>
-          View report
-        </BelReportButton>
-        {/*
-        <a className="bel-btn outline" href={belReportPdf} download="BEL Industry Report.pdf">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8"><path d="M12 3v13"/><polyline points="6,11 12,17 18,11"/><path d="M4 21h16"/></svg>
-          Download PDF
-        </a> */}
-      </div>
-
-      <div className="bel-stats">
-        {BEL_STATS.map((s) => (
-          <div className="bel-stat" key={s.label}>
-            <div className="bel-stat-num">{s.num}</div>
-            <div className="bel-stat-label">{s.label}</div>
+        <div className="bel-top-row">
+          <div className="bel-tags">
+            <span className="bel-tag">In Collaboration with Keskisuomalainen Oyj</span>
+            <span className="bel-tag">Funded by Media Industry Research Foundation of Finland</span>
+            <span className="bel-tag">Jan – Jul 2026</span>
           </div>
-        ))}
-      </div>
-
-      <div className="bel-cols">
-        <div>
-          <span className="bel-eyebrow">The Problem</span>
-          <h2 className="bel-h2">Easy news stops helping right when learners need it most</h2>
-          <p className="bel-p">
-            Easy Finnish serves roughly 11–14% of Finland's population, but for language learners only during a short
-            window, between A2 and B1. Beyond that, easy news feels too simple while standard news is still too hard.
-            Readers land in a limbo with no format made for them.
-          </p>
-        </div>
-        <div>
-          <span className="bel-eyebrow">The Idea</span>
-          <h2 className="bel-h2">Make difficulty a control held by the reader</h2>
-          <p className="bel-p">
-            Working with university students learning Finnish, we built two AI features into the real reading
-            environment of Helsingin Uutiset. So every article can meet the reader at their level, with the
-            original always one tap away.
-          </p>
-        </div>
-      </div>
-
-      <span className="bel-eyebrow">What we built</span>
-      <div className="bel-cards">
-        <div className="bel-card">
-          <div className="bel-pill-row">
-            <span className="bel-pill tone-1">A2</span>
-            <span className="bel-pill tone-2">B1</span>
-            <span className="bel-pill tone-3">B2</span>
-            <span className="bel-pill tone-4">Original</span>
+          <div className="bel-cta">
+            <BelReportButton variant="solid" onClick={() => setPdfOpen(true)}>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8"><path d="M1.5 12s3.8-7 10.5-7 10.5 7 10.5 7-3.8 7-10.5 7S1.5 12 1.5 12z"/><circle cx="12" cy="12" r="3"/></svg>
+              View report
+            </BelReportButton>
           </div>
-          <h3>The level selector</h3>
-          <p className="bel-p" style={{ fontSize: 15 }}>
-            Every article in four versions, three generated by an LLM and checked against 40 official Easy Finnish
-            criteria. Shared paragraph structure lets readers hop between levels or to the original without
-            losing their place.
-          </p>
         </div>
-        <div className="bel-card">
-          <div className="bel-highlight-demo">
-            Suomen <mark>eduskunta päätti</mark> uudesta laista…
-            <span className="bel-gloss">→ "eduskunta päätti" = the parliament decided (past tense)</span>
+
+        <div className="bel-stats">
+          {BEL_STATS.map((s) => (
+            <div className="bel-stat" key={s.label}>
+              <div className="bel-stat-num">{s.num}</div>
+              <div className="bel-stat-label">{s.label}</div>
+            </div>
+          ))}
+        </div>
+
+        <div className="bel-cols">
+          <div>
+            <span className="bel-eyebrow">The Problem</span>
+            <h2 className="bel-h2">Easy news stops helping right when learners need it most</h2>
+            <p className="bel-p">
+              Easy Finnish serves roughly 11–14% of Finland's population, but for language learners only during a short
+              window, between A2 and B1. Beyond that, easy news feels too simple while standard news is still too hard.
+              Readers land in a limbo with no format made for them.
+            </p>
           </div>
-          <h3>The highlighter</h3>
-          <p className="bel-p" style={{ fontSize: 15 }}>
-            Select any word, phrase or paragraph and get an explanation tuned to your proficiency level such as grammar,
-            vocabulary or content, with the full article as context.
-          </p>
-        </div>
-      </div>
-
-      <span className="bel-eyebrow">What we found</span>
-      <div className="bel-findings">
-        {BEL_FINDINGS.map((f, i) => (
-          <div key={i}>
-            <div className="bel-finding-bar" />
-            <p className="bel-p" style={{ fontSize: 15.5 }}>{f.text}</p>
+          <div>
+            <span className="bel-eyebrow">The Idea</span>
+            <h2 className="bel-h2">Make difficulty a control held by the reader</h2>
+            <p className="bel-p">
+              Working with university students learning Finnish, we built two AI features into the real reading
+              environment of Helsingin Uutiset. So every article can meet the reader at their level, with the
+              original always one tap away.
+            </p>
           </div>
-        ))}
-      </div>
-
-      <div className="bel-callout-ring">
-        <div className="bel-callout">
-          <span className="bel-eyebrow">For newsrooms</span>
-          <p>
-            Cover real current issues, not just "immigrant topics". Simplify everything, keep it free, and always
-            keep the original one tap away. Above all: give readers control over the simplification.
-          </p>
         </div>
       </div>
 
-      <div className="bel-footer">
-        <p>Begüm Çelik · Lù Chén · Vertti Luostarinen. The full research paper is forthcoming. <br></br>Report licensed under CC BY 4.0.</p>
-        <div className="bel-footer-actions">
-          <BelReportButton variant="outline" onClick={() => setPdfOpen(false)}>View report</BelReportButton>
-          {/*<a className="bel-btn solid" href={belReportPdf} download="BEL Industry Report.pdf">Download PDF</a>*/}
+      <div className="bel-second">
+        <span className="bel-eyebrow">What we built</span>
+        <div className="bel-cards">
+          <div className="bel-card">
+            <div className="bel-pill-row">
+              <span className="bel-pill tone-1">A2</span>
+              <span className="bel-pill tone-2">B1</span>
+              <span className="bel-pill tone-3">B2</span>
+              <span className="bel-pill tone-4">Original</span>
+            </div>
+            <h3>The level selector</h3>
+            <p className="bel-p" style={{ fontSize: 15 }}>
+              Every article in four versions, three generated by an LLM and checked against 40 official Easy Finnish
+              criteria. Shared paragraph structure lets readers hop between levels or to the original without
+              losing their place.
+            </p>
+          </div>
+          <div className="bel-card">
+            <div className="bel-highlight-demo">
+              Suomen <mark>eduskunta päätti</mark> uudesta laista…
+              <span className="bel-gloss">→ "eduskunta päätti" = the parliament decided (past tense)</span>
+            </div>
+            <h3>The highlighter</h3>
+            <p className="bel-p" style={{ fontSize: 15 }}>
+              Select any word, phrase or paragraph and get an explanation tuned to your proficiency level such as grammar,
+              vocabulary or content, with the full article as context.
+            </p>
+          </div>
+        </div>
+
+        <span className="bel-eyebrow">What we found</span>
+        <div className="bel-findings">
+          {BEL_FINDINGS.map((f, i) => (
+            <div key={i}>
+              <div className="bel-finding-bar" />
+              <p className="bel-p" style={{ fontSize: 15.5 }}>{f.text}</p>
+            </div>
+          ))}
+        </div>
+
+        <div className="bel-callout-ring">
+          <div className="bel-callout">
+            <span className="bel-eyebrow">For newsrooms</span>
+            <p>
+              Cover real current issues, not just "immigrant topics". Simplify everything, keep it free, and always
+              keep the original one tap away. Above all: give readers control over the simplification.
+            </p>
+          </div>
         </div>
       </div>
 
@@ -510,7 +599,7 @@ export function BEL() {
             <div className="bel-modal-head">
               <span>BEL Industry Report — PDF</span>
               <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
-                <a className="bel-btn solid" style={{ padding: '7px 16px', fontSize: 12.5 }} href={belReportPdf} download="BEL Industry Report.pdf">Download</a>
+                <a className="bel-btn solid" style={{ padding: '0 16px', fontSize: 12.5 }} href={belReportPdf} download="BEL Industry Report.pdf">Download</a>
                 <button className="bel-modal-close" title="Close" onClick={() => setPdfOpen(false)}>✕</button>
               </div>
             </div>

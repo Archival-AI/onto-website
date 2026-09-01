@@ -13,10 +13,17 @@ npm run dev
 
 ## To do
 - [] Review and revise all the website content
+- [] Change BEL pdf once finalized
+- [] Sound effects on side bar menu (open-close-hover sounds)
+
+Bugs:
+- [] Mobile version design fixes.
+- [] There is no way to go back to the landing page, as the menu button doesn't work. I'm using Chrome on Android.
+- [x] Images are not displayed/missing on the About us -page.
 
 Landing page:
 - [ ] Home page text placement fixes
-- [ ] Home page text morph interaction or some other kind of interaction?
+- [x] Home page text morph interaction or some other kind of interaction
 - [x] I would leave out the sentence "From chaos to clarity with humans in the loop" from the landing page.
 - [x] Also I think that the text from the about us-section expresses more concisely what we are about, so I would put on the landing page: "A media lab at the intersection of art, archives and artificial intelligence" and that's all. 
 - [x] I would hide the Github link until we have stuff there.
@@ -26,10 +33,10 @@ Archival AI:
 
 BEL:
 - [x] Page that introduces the project and has the download link to the report.
-- [] Change BEL pdf once finalized
+- [] Make scrollable 2 page view instead one long page. 
 
 Portfolio:
-- [] Since we now have three actual client cases, Kalevala, BEL and FMI, I would include those here instead of our old stuff. 
+- [] Since we now have three actual client cases, Kalevala, BEL and FMI, I would include those here instead of our old stuff.
 - [x] We could link these earlier works in the About us -section instead.
 
 Blog:
@@ -48,7 +55,3 @@ Contact:
 - [x] I would remove everything from this page, except for the email pattern (firstname@onto.fi) and the address in the end. 
 - [x] I would also include there our actual company name and Y-tunnus.
 
-Bugs:
-- [] There is no way to go back to the landing page, as the menu button doesn't work. I'm using Chrome on Android.
-- [] Images are not displayed/missing on the About us -page.
-- [] Mobile version design fixes.

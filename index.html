@@ -235,7 +235,7 @@
   }
   .home-inner{
     width:min(1280px,92%);
-    display:flex;flex-direction:column;gap:48px;
+    display:flex;flex-direction:column;gap:8px;
     transform:translateY(-2vh);
   }
   .eyebrow{
@@ -249,45 +249,54 @@
     font-weight:400;
     color:var(--ink);
     display:flex;flex-direction:column;align-items:flex-start;
-    gap: clamp(8px, 1.2vw, 24px);
+    gap: 0;
   }
-  .hero .we{ font-size:.42em; opacity:.92; letter-spacing:-.02em;}
-  .hero .onto-wrap{
+  .hero .we{ font-size:.24em; opacity:.92; letter-spacing:-.02em; margin-bottom:-1.5em; margin-left:1.3em;}
+
+  /* Particle logo (canvas-rendered from the real onto-logo.png) */
+  .hero .particle-wrap{
     position:relative;
     display:block;
     cursor:default;
     width:100%;
     max-width: min(78vw, 1100px);
+    height: clamp(220px, 26vw, 380px);
   }
-  .hero .onto-img{
-    display:block; width:100%; height:auto;
-    transform-origin:center center;
-    will-change:transform,filter;
-    transition:transform .25s cubic-bezier(.2,.8,.2,1.2);
+  .hero .particle-canvas{
+    position:absolute; inset:0;
+    width:100%; height:100%;
+    display:block;
+    touch-action:none;
   }
-  /* The morphing word sits over the underscore pill of the logo. */
-  .hero .slot{
+  /* Typewriter word — positioned via inline style computed from the
+     logo's real measured underscore geometry (see ParticleLogo onMeasure).
+     These left/right/bottom values are only a fallback used before the
+     first measurement completes. */
+  .hero .typewriter{
     position:absolute;
-    /* nudged to sit over the underscore pill of the logo */
-    left:46%; right:12%;
-    top:62%; bottom:8%;
-    display:flex; align-items:center; justify-content:center;
+    left:56%; right:4%;
+    bottom:30%;
+    display:flex; align-items:flex-end; justify-content:flex-start;
     pointer-events:none;
-    z-index:2;
+    z-index:3;
   }
-  .hero .word{
-    position:relative;
-    display:inline-block;
-    /* make the morph text larger and dark so it sits visually over the logo underscore */
+  .hero .typewriter .tw-text{
     color:var(--ink);
-    font-size: .32em;
+    font-size: .4em;
     line-height:1;
     font-weight:600;
     white-space:nowrap;
-    pointer-events:auto;
     letter-spacing:.02em;
-    z-index:3;
   }
+  .hero .typewriter .tw-caret{
+    display:inline-block;
+    width:.045em; height:.85em;
+    background:var(--ink);
+    margin-left:.06em;
+    vertical-align:-0.08em;
+    animation: caretblink 1s step-end infinite;
+  }
+  @keyframes caretblink{0%,45%{opacity:1}55%,100%{opacity:0}}
 
   .hero-sub{
     font-size:18px;line-height:1.5;
@@ -295,6 +304,7 @@
     color:var(--ink-soft);
     opacity:.85;
     margin-top:8px;
+    margin-left:3em;
   }
   .hero-meta{
     display:flex;gap:36px;flex-wrap:wrap;
@@ -324,15 +334,42 @@
   @media (max-width:900px){.col-2{grid-template-columns:1fr;}}
 
   /* BEL page */
-  .bel-tags{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:40px;}
-  .bel-tag{
-    font-size:12.5px;color:var(--ink-soft);background:rgba(0,0,0,.04);
-    border:1px solid rgba(0,0,0,.1);border-radius:999px;padding:6px 14px;
+  .bel-page{ padding-top:0 !important; padding-bottom:0 !important; }
+  .bel-hero{
+    position:sticky;
+    top:0;
+    z-index:1;
+    min-height:100vh;
+    padding-top:96px;
+    display:flex;
+    flex-direction:column;
+    justify-content:flex-start;
+    background:transparent;
   }
-  .bel-cta{display:flex;flex-wrap:wrap;gap:14px;margin-bottom:56px;}
+  .bel-hero .page-lede{ margin-bottom:28px; }
+  .bel-second{
+    position:relative;
+    z-index:2;
+    background:var(--paper);
+    border-radius:40px 40px 0 0;
+    margin:0 -8vw 0 -6vw;
+    padding:96px 8vw 96px 6vw;
+    min-height:100vh;
+  }
+  .bel-top-row{
+    display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;
+    gap:16px;margin-bottom:56px;
+  }
+  .bel-tags{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:0;}
+  .bel-tag{
+    display:inline-flex;align-items:center;box-sizing:border-box;height:44px;
+    font-size:12.5px;color:var(--ink-soft);background:rgba(0,0,0,.04);
+    border:1px solid rgba(0,0,0,.1);border-radius:999px;padding:0 16px;
+  }
+  .bel-cta{display:flex;flex-wrap:wrap;gap:14px;margin-bottom:0;}
   .bel-btn{
-    display:inline-flex;align-items:center;gap:10px;
-    padding:13px 26px;border-radius:999px;
+    display:inline-flex;align-items:center;gap:10px;box-sizing:border-box;height:44px;
+    padding:0 26px;border-radius:999px;
     font-family:var(--font);font-size:14px;font-weight:400;letter-spacing:.02em;
     cursor:pointer;border:1.5px solid var(--ink);
     transition:background .15s ease,color .15s ease,border-color .15s ease;
@@ -343,19 +380,19 @@
   .bel-btn.outline:hover{background:var(--pink);color:#2b1226;border-color:var(--pink);}
   .bel-stats{
     display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));
-    gap:16px;margin-bottom:64px;
+    gap:16px;margin-bottom:48px;
   }
   .bel-stat{
     border-radius:18px;
     background:rgba(255,255,255,.82);backdrop-filter:blur(10px);
-    padding:22px 20px;height:100%;box-sizing:border-box;
+    padding:14px 20px;height:100%;box-sizing:border-box;
     box-shadow:0 14px 32px rgba(120,40,90,0.1);
   }
   .bel-stat-num{font-size:40px;font-weight:400;letter-spacing:-.02em;color:#8a2d67;line-height:1;}
-  .bel-stat-label{font-size:13.5px;color:var(--ink-soft);margin-top:8px;line-height:1.5;}
+  .bel-stat-label{font-size:13.5px;color:var(--ink-soft);margin-top:6px;line-height:1.5;}
   .bel-cols{
     display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,380px),1fr));
-    gap:48px;margin-bottom:64px;
+    gap:48px;margin-bottom:0;
   }
   .bel-eyebrow{font-size:11px;letter-spacing:.3em;text-transform:uppercase;color:#8a2d67;font-weight:700;}
   .bel-h2{
@@ -886,7 +923,7 @@
   /* Logo treatment variants */
   .logo-stacked .hero{flex-direction:column;align-items:flex-start;gap:6px;}
   .logo-stacked .hero .we{font-size:.5em;letter-spacing:.02em;opacity:.55;}
-  .logo-inline-mark .hero .onto-wrap::after{
+  .logo-inline-mark .hero .particle-wrap::after{
     content:"";display:inline-block;width:.18em;height:.18em;
     background:var(--ink);border-radius:50%;margin-left:.06em;align-self:flex-end;transform:translateY(-.16em);
   }

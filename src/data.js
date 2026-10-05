@@ -14,7 +14,7 @@ export const NAV = [
   { id: 'contact',   label: 'Contact',              },
 ];
 
-export const WORDS = ['Media', 'Archive', 'AI', 'Data', 'Design', 'Experience'];
+export const WORDS = ['media', 'archive', 'ai', 'data', 'design', 'research'];
 
 export const SERVICES = [
   {
@@ -153,7 +153,7 @@ export const TEAM = [
   {
     name: 'Vertti Luostarinen',
     role: 'AI Researcher & Developer',
-    bio: 'Finnish media artist, developer and AI researcher. Holds an MA in New Media from Aalto University. Multidisciplinary practice at the intersection of artistic research, media, and technology. Works as an AI researcher with Alma Media and Yle News Lab; part of Ekho Collective.',
+    bio: 'Finnish media artist, developer and AI researcher. Holds an MA in New Media from Aalto University. Multidisciplinary practice at the intersection of artistic research, media, and technology. Has worked with AI-related R&D projects, mainly with media industry partners, including Yle News Lab and Alma Media. Data scientist in the artist group Ekho Collective.',
     link: 'https://www.linkedin.com/in/vertti-luostarinen-b31012155/',
     web: 'https://vertti.eu/',
     mail: 'mailto:vertti@onto.fi',

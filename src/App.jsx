@@ -1,5 +1,5 @@
 // App.jsx — shell, menu, page swap, tweaks
-import React, { useState } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import { NAV } from './data'
 import { useTweaks, TweaksPanel, TweakSection, TweakRadio } from './tweaks-panel'
 import { Home, Portfolio, Blog, Manifesto, About, Contact, BEL } from './pages'
@@ -18,8 +18,47 @@ export default function App() {
   const [active, setActive] = useState('home')
   const [prev, setPrev] = useState(null)
   const [menuOpen, setMenuOpen] = useState(false)
+  const [mobileOpen, setMobileOpen] = useState(false)
+  const toggleRef = useRef(null)
+  const panelRef = useRef(null)
+  const stageRef = useRef(null)
 
   const collapsed = active !== 'home' && !menuOpen
+
+  // Mobile overlay menu: lock scroll, make page inert, trap focus, Esc to close,
+  // and hand focus back to the menu button when it closes.
+  useEffect(() => {
+    if (!mobileOpen) return
+    const prevOverflow = document.body.style.overflow
+    document.body.style.overflow = 'hidden'
+    const stage = stageRef.current
+    if (stage) stage.setAttribute('inert', '')
+    const panel = panelRef.current
+    const items = () => Array.from(panel.querySelectorAll('button, a[href]'))
+    const first = items()[0]
+    if (first) first.focus()
+
+    const onKey = (e) => {
+      if (e.key === 'Escape') { e.preventDefault(); setMobileOpen(false); return }
+      if (e.key !== 'Tab') return
+      const trap = [toggleRef.current, ...items()].filter(Boolean)
+      const i = trap.indexOf(document.activeElement)
+      e.preventDefault()
+      if (e.shiftKey) trap[(i <= 0 ? trap.length : i) - 1].focus()
+      else trap[(i + 1) % trap.length].focus()
+    }
+    const mq = window.matchMedia('(min-width: 768px)')
+    const onMq = () => { if (mq.matches) setMobileOpen(false) }
+    document.addEventListener('keydown', onKey)
+    mq.addEventListener('change', onMq)
+    return () => {
+      document.removeEventListener('keydown', onKey)
+      mq.removeEventListener('change', onMq)
+      document.body.style.overflow = prevOverflow
+      if (stage) stage.removeAttribute('inert')
+      if (toggleRef.current) toggleRef.current.focus()
+    }
+  }, [mobileOpen])
 
   const go = (id) => {
     const item = NAV.find(n => n.id === id)
@@ -27,6 +66,7 @@ export default function App() {
       window.open(item.external, '_blank', 'noopener')
       return
     }
+    setMobileOpen(false)
     if (id === active) { setMenuOpen(false); return }
     setPrev(active)
     setActive(id)
@@ -49,6 +89,53 @@ export default function App() {
 
   return (
     <div className={`app ${collapsed ? 'collapsed' : ''}`}>
+      {/* Mobile menu button (< 768px) — fixed top-left; morphs into an X */}
+      <button
+        ref={toggleRef}
+        type="button"
+        className={`mobile-toggle ${mobileOpen ? 'is-open' : ''}`}
+        aria-expanded={mobileOpen}
+        aria-controls="mobile-menu"
+        aria-label={mobileOpen ? 'Close menu' : 'Open menu'}
+        onClick={() => setMobileOpen(o => !o)}
+      >
+        <span className="mt-icon" aria-hidden="true">
+          {mobileOpen
+            ? <span className="mt-x">✕</span>
+            : <img src={iconOutline} alt="" />}
+        </span>
+        <span className="mt-lbl" aria-hidden="true">{mobileOpen ? 'Close' : 'Menu'}</span>
+      </button>
+
+      {/* Mobile overlay — sits ON TOP of the content, never pushes it */}
+      <div className={`mobile-overlay ${mobileOpen ? 'is-open' : ''}`}>
+        <div className="mobile-backdrop" onClick={() => setMobileOpen(false)} aria-hidden="true" />
+        <nav id="mobile-menu" ref={panelRef} className="mobile-panel" aria-label="Main" aria-hidden={!mobileOpen}>
+          <ol>
+            {NAV.map(n => (
+              <li key={n.id}>
+                <button
+                  className={`mobile-link ${active === n.id ? 'active' : ''}`}
+                  onClick={() => go(n.id)}
+                  tabIndex={mobileOpen ? 0 : -1}
+                >
+                  {n.id === 'home'
+                    ? <img src={ontoLogo} alt="onto — Home" />
+                    : <span>{n.label.toUpperCase()}</span>}
+                </button>
+              </li>
+            ))}
+          </ol>
+          <div className="mobile-foot">
+            <a href="https://www.linkedin.com/company/onto-fi/" target="_blank" rel="noreferrer" aria-label="LinkedIn" tabIndex={mobileOpen ? 0 : -1}>
+              <svg viewBox="0 0 24 24" fill="currentColor" width="18" height="18">
+                <path d="M4.98 3.5C4.98 4.88 3.87 6 2.5 6S0 4.88 0 3.5 1.12 1 2.5 1s2.48 1.12 2.48 2.5zM.22 8h4.56v14H.22V8zm7.34 0h4.37v1.92h.06c.61-1.15 2.1-2.36 4.32-2.36 4.62 0 5.47 3.04 5.47 7v7.44h-4.56v-6.6c0-1.57-.03-3.6-2.2-3.6-2.2 0-2.54 1.72-2.54 3.49V22H7.56V8z"/>
+              </svg>
+            </a>
+            <div className="copy">© 2026 Dasein AI Oy</div>
+          </div>
+        </nav>
+      </div>
       <nav
         className="menu"
         onMouseEnter={() => active !== 'home' && setMenuOpen(true)}
@@ -100,7 +187,7 @@ export default function App() {
         </div>
       </nav>
 
-      <main className="stage">
+      <main className="stage" ref={stageRef}>
         {prev && prev !== active && (
           <div className="page-slot out" key={`prev-${prev}`}>
             {renderPage(prev)}

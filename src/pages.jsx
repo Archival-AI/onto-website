@@ -1,5 +1,6 @@
 // Pages — Home + inner pages
-import React, { useState, useEffect, useRef } from 'react'
+import React, { useState, useEffect, useRef, useId } from 'react'
+import { createPortal } from 'react-dom'
 import { WORDS, PORTFOLIO, BLOG, BLOG_TAGS, TEAM, SERVICES } from './data'
 import ontoLogo from '../assets/onto-logo.png'
 import belReportPdf from '../assets/bel/BEL-Industry-Report.pdf'
@@ -37,7 +38,7 @@ function ParticleLogo({ src, onMeasure }) {
     const ctx = cv.getContext('2d');
     let W = 0, H = 0, dpr = 1;
     let parts = [];
-    const gap = 6;
+    let gap = 6;
     const repelR = 90;
 
     const img = new Image();
@@ -47,6 +48,7 @@ function ParticleLogo({ src, onMeasure }) {
       dpr = Math.min(2, window.devicePixelRatio || 1);
       W = cv.clientWidth; H = cv.clientHeight;
       if (!W || !H || !img.naturalWidth || !img.naturalHeight) return;
+      gap = W < 520 ? 4 : 6;   // denser dots on small screens so the logo stays legible
       cv.width = W * dpr; cv.height = H * dpr;
 
       const off = document.createElement('canvas');
@@ -192,6 +194,18 @@ function useTypewriter(words) {
   useEffect(() => {
     let alive = true;
     let timeoutId = null;
+    // prefers-reduced-motion: no letter-by-letter typing, just swap whole words slowly
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      let i = 0;
+      const swap = () => {
+        if (!alive) return;
+        setText(words[i]);
+        i = (i + 1) % words.length;
+        timeoutId = setTimeout(swap, 2400);
+      };
+      swap();
+      return () => { alive = false; clearTimeout(timeoutId); };
+    }
     let wi = 0, ci = 0, deleting = false;
     const tick = () => {
       if (!alive) return;
@@ -265,12 +279,27 @@ function TeamCarousel({ people }) {
   const dragRef = useRef(null);
   const rafRef = useRef(null);
   const suppressClickRef = useRef(false);
+  const wheelRef = useRef(null);
+  const [wheelW, setWheelW] = useState(560);
+
+  useEffect(() => {
+    const el = wheelRef.current;
+    if (!el || typeof ResizeObserver === 'undefined') return;
+    const ro = new ResizeObserver(() => setWheelW(el.clientWidth || 560));
+    ro.observe(el);
+    setWheelW(el.clientWidth || 560);
+    return () => ro.disconnect();
+  }, []);
 
   useEffect(() => { rotRef.current = rot; }, [rot]);
   useEffect(() => () => cancelAnimationFrame(rafRef.current), []);
 
   const animateTo = (target) => {
     cancelAnimationFrame(rafRef.current);
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      setRot(target);
+      return;
+    }
     const from = rotRef.current;
     const d = target - from;
     const t0 = performance.now();
@@ -314,7 +343,9 @@ function TeamCarousel({ people }) {
     snap();
   };
 
-  const step = 120, R = 260, tilt = 14;
+  const step = 120, tilt = 14;
+  // Orbit radius follows the (responsive) wheel width so cards never leave it on small screens
+  const R = Math.max(110, Math.min(260, wheelW * 0.46));
   let best = 0, bestA = 999;
   const cards = people.map((p, i) => {
     let a = ((i * step + rot) % 360 + 360) % 360;
@@ -339,6 +370,7 @@ function TeamCarousel({ people }) {
     <div className="about-carousel">
       <div
         className="tc-wheel"
+        ref={wheelRef}
         onPointerDown={onDown}
         onPointerMove={onMove}
         onPointerUp={onUp}
@@ -473,9 +505,9 @@ const BEL_STATS = [
 ];
 
 const BEL_FINDINGS = [
-  { text: <><strong>Readers compared levels as a strategy</strong> starting at B2, dropping to A2 when confused, escalating to the original when something felt off. Choice itself lowered the threshold for reading in Finnish.</> },
+  { text: <><strong>Readers compared levels as a strategy</strong> — starting at B2, dropping to A2 when confused, escalating to the original when something felt off. Choice itself lowered the threshold for reading in Finnish.</> },
   { text: <><strong>The original is the ground truth.</strong> One-click access to the standard article built trust. Readers switched to it whenever a simplification felt strange or unclear.</> },
-  { text: <><strong>On-demand explanations were hit-or-miss</strong> Strong on vocabulary, weak on cultural context the article itself doesn't carry. Readers asked for translations, grammar notes and saved-word review.</> },
+  { text: <><strong>On-demand explanations were hit-or-miss.</strong> Strong on vocabulary, weak on cultural context the article itself doesn't carry. Readers asked for translations, grammar notes and saved-word review.</> },
 ];
 
 function BelReportButton({ onClick, variant = 'solid', children }) {
@@ -488,9 +520,17 @@ function BelReportButton({ onClick, variant = 'solid', children }) {
 
 export function BEL() {
   const [pdfOpen, setPdfOpen] = useState(false);
+  const [level, setLevel] = useState('B1');
+  const [glossOpen, setGlossOpen] = useState(false);
+  const LEVELS = [
+    { id: 'A2', tone: 'tone-1' },
+    { id: 'B1', tone: 'tone-2' },
+    { id: 'B2', tone: 'tone-3' },
+    { id: 'Original', tone: 'tone-4' },
+  ];
   return (
-    <div className="page bel-page" data-screen-label="BEL Project">
-      <div className="bel-hero">
+    <div className="page bel-page snap-page" data-screen-label="BEL Project">
+      <section className="snap-screen bel-hero">
         <div className="page-eyebrow">Current Research</div>
         <h1 className="page-title">Beyond Easy Language</h1>
         <p className="page-lede">
@@ -499,18 +539,24 @@ export function BEL() {
 
         <div className="bel-top-row">
           <div className="bel-tags">
-            <span className="bel-tag">In Collaboration with Keskisuomalainen Oyj</span>
+            <span className="bel-tag">In Collaboration with Keskisuomalainen Oyj &amp; University of Helsinki</span>
             <span className="bel-tag">Funded by Media Industry Research Foundation of Finland</span>
-            <span className="bel-tag">Jan – Jul 2026</span>
+            <span className="bel-tag">Conducted Jan – Jul 2026</span>
           </div>
           <div className="bel-cta">
             <BelReportButton variant="solid" onClick={() => setPdfOpen(true)}>
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8"><path d="M1.5 12s3.8-7 10.5-7 10.5 7 10.5 7-3.8 7-10.5 7S1.5 12 1.5 12z"/><circle cx="12" cy="12" r="3"/></svg>
-              View report
+              View Industry Report
             </BelReportButton>
+            {/*
+                        <a className="bel-btn outline" href={belReportPdf} download="BEL Industry Report.pdf">
+              Download report
+            </a>
+             */}
+
           </div>
         </div>
-
+{/*
         <div className="bel-stats">
           {BEL_STATS.map((s) => (
             <div className="bel-stat" key={s.label}>
@@ -519,41 +565,48 @@ export function BEL() {
             </div>
           ))}
         </div>
-
+  */}
         <div className="bel-cols">
-          <div>
+          <div className="bel-card">
             <span className="bel-eyebrow">The Problem</span>
-            <h2 className="bel-h2">Easy news stops helping right when learners need it most</h2>
+            <h2 className="bel-h2">Easy Language news stops helping right when learners need it most</h2>
             <p className="bel-p">
               Easy Finnish serves roughly 11–14% of Finland's population, but for language learners only during a short
-              window, between A2 and B1. Beyond that, easy news feels too simple while standard news is still too hard.
-              Readers land in a limbo with no format made for them.
+              window, between the A2 and B1 learning phases. Beyond that, Easy Language feels too simple, yet standard
+              language news is still too hard. Readers land in a limbo with no format made for them.
             </p>
           </div>
-          <div>
+          <div className="bel-card">
             <span className="bel-eyebrow">The Idea</span>
             <h2 className="bel-h2">Make difficulty a control held by the reader</h2>
             <p className="bel-p">
-              Working with university students learning Finnish, we built two AI features into the real reading
-              environment of Helsingin Uutiset. So every article can meet the reader at their level, with the
+              Working with university students learning Finnish, we built two AI features for the local newspaper
+              Helsingin Uutiset. The goal was to ensure that every article can meet the reader at their level, with the
               original always one tap away.
             </p>
           </div>
         </div>
-      </div>
+      </section>
 
-      <div className="bel-second">
+      <section className="snap-screen bel-second">
         <span className="bel-eyebrow">What we built</span>
         <div className="bel-cards">
           <div className="bel-card">
-            <div className="bel-pill-row">
-              <span className="bel-pill tone-1">A2</span>
-              <span className="bel-pill tone-2">B1</span>
-              <span className="bel-pill tone-3">B2</span>
-              <span className="bel-pill tone-4">Original</span>
+            <div className="bel-pill-row" role="group" aria-label="Reading level">
+              {LEVELS.map((l) => (
+                <button
+                  key={l.id}
+                  type="button"
+                  className={`bel-pill ${l.tone} ${level === l.id ? 'is-on' : ''}`}
+                  aria-pressed={level === l.id}
+                  onClick={() => setLevel(l.id)}
+                >
+                  {l.id}
+                </button>
+              ))}
             </div>
             <h3>The level selector</h3>
-            <p className="bel-p" style={{ fontSize: 15 }}>
+            <p className="bel-p bel-p-sm">
               Every article in four versions, three generated by an LLM and checked against 40 official Easy Finnish
               criteria. Shared paragraph structure lets readers hop between levels or to the original without
               losing their place.
@@ -561,11 +614,22 @@ export function BEL() {
           </div>
           <div className="bel-card">
             <div className="bel-highlight-demo">
-              Suomen <mark>eduskunta päätti</mark> uudesta laista…
-              <span className="bel-gloss">→ "eduskunta päätti" = the parliament decided (past tense)</span>
+              Suomen{' '}
+              <mark
+                tabIndex={0}
+                role="button"
+                aria-expanded={glossOpen}
+                onClick={() => setGlossOpen((o) => !o)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setGlossOpen((o) => !o); }
+                  if (e.key === 'Escape') setGlossOpen(false);
+                }}
+              >eduskunta päätti</mark>{' '}
+              uudesta laista…
+              <span className={`bel-gloss ${glossOpen ? 'is-open' : ''}`}>→ "eduskunta päätti" = the parliament decided (past tense)</span>
             </div>
             <h3>The highlighter</h3>
-            <p className="bel-p" style={{ fontSize: 15 }}>
+            <p className="bel-p bel-p-sm">
               Select any word, phrase or paragraph and get an explanation tuned to your proficiency level such as grammar,
               vocabulary or content, with the full article as context.
             </p>
@@ -577,7 +641,7 @@ export function BEL() {
           {BEL_FINDINGS.map((f, i) => (
             <div key={i}>
               <div className="bel-finding-bar" />
-              <p className="bel-p" style={{ fontSize: 15.5 }}>{f.text}</p>
+              <p className="bel-p bel-p-sm">{f.text}</p>
             </div>
           ))}
         </div>
@@ -591,7 +655,7 @@ export function BEL() {
             </p>
           </div>
         </div>
-      </div>
+      </section>
 
       {pdfOpen && (
         <div className="bel-modal-overlay" onClick={() => setPdfOpen(false)}>
@@ -656,17 +720,79 @@ export function Blog() {
 }
 
 function LuNote({ children, note }) {
-  return (
-    <span className="lu-note" tabIndex={0}>
-      {children}
-      <span className="lu-pop">
+  const id = useId();
+  const popId = `lu-pop-${id.replace(/:/g, '')}`;
+  const anchorRef = useRef(null);
+  const closeTimer = useRef(null);
+  const [open, setOpen] = useState(false);
+  const touch = useRef(false);
+
+  const show = () => {
+    clearTimeout(closeTimer.current);
+    setOpen(true);
+  };
+  const hide = () => { clearTimeout(closeTimer.current); setOpen(false); };
+  const hideSoon = () => {
+    clearTimeout(closeTimer.current);
+    closeTimer.current = setTimeout(() => setOpen(false), 160);
+  };
+
+  useEffect(() => () => clearTimeout(closeTimer.current), []);
+
+  useEffect(() => {
+    if (!open) return;
+    const onKey = (e) => { if (e.key === 'Escape') { setOpen(false); anchorRef.current && anchorRef.current.focus(); } };
+    document.addEventListener('keydown', onKey);
+    return () => document.removeEventListener('keydown', onKey);
+  }, [open]);
+
+  const isTouchDevice = () =>
+    typeof window !== 'undefined' && window.matchMedia && window.matchMedia('(hover: none)').matches;
+
+  const popup = (
+    <>
+      {open && isTouchDevice() && (
+        <div className="lu-backdrop" onClick={hide} aria-hidden="true" />
+      )}
+      <div
+        id={popId}
+        role={isTouchDevice() ? 'dialog' : 'tooltip'}
+        aria-hidden={!open}
+        className={`lu-pop ${open ? 'is-open' : ''} ${isTouchDevice() ? 'is-sheet' : ''}`}
+        onMouseEnter={() => { if (!isTouchDevice()) clearTimeout(closeTimer.current); }}
+        onMouseLeave={() => { if (!isTouchDevice()) hideSoon(); }}
+      >
         <span className="lu-pop-head">
           <span className="lu-pop-avatar" style={{ backgroundImage: `url(${luPhoto})` }} />
           <span className="lu-pop-tag">/// Lù</span>
+          {isTouchDevice() && (
+            <button type="button" className="lu-pop-close" onClick={hide} aria-label="Close note">✕</button>
+          )}
         </span>
         <span className="lu-pop-text">{note}</span>
+      </div>
+    </>
+  );
+
+  return (
+    <>
+      <span
+        ref={anchorRef}
+        className="lu-note"
+        tabIndex={0}
+        aria-describedby={popId}
+        onMouseEnter={() => { if (!isTouchDevice()) show(); }}
+        onMouseLeave={() => { if (!isTouchDevice()) hideSoon(); }}
+        onFocus={() => { if (!touch.current) show(); }}
+        onBlur={() => { if (!isTouchDevice()) hideSoon(); }}
+        onPointerDown={(e) => { touch.current = e.pointerType === 'touch'; }}
+        onClick={() => { if (isTouchDevice()) (open ? hide() : show()); }}
+        onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); open ? hide() : show(); } }}
+      >
+        {children}
       </span>
-    </span>
+      {createPortal(popup, document.body)}
+    </>
   );
 }
 
@@ -800,7 +926,7 @@ const MANIFESTO_FINAL = [
 
 export function Manifesto() {
   return (
-    <div className="page" data-screen-label="Manifesto">
+    <div className="page man-page" data-screen-label="Manifesto">
       <div className="page-eyebrow">Our Values</div>
       <h1 className="page-title">The Critical AI Engineering Manifesto</h1>
       <p className="man-byline">By Vertti Luostarinen · annotated by Lù Chén</p>
@@ -841,10 +967,106 @@ export function Manifesto() {
   );
 }
 
+/* ─────────────────── Image trail (desktop / fine pointer only) ───────────────────
+   Photos of the team spawn along the cursor path and fade out (after Codrops'
+   Image Trail Effects, demo 1). Tweak the constants below; size is the CSS var
+   --trail-img-w on .trail-layer. */
+const TRAIL_DISTANCE = 90;    // px the cursor must travel before the next image spawns
+const TRAIL_MAX_VISIBLE = 7;  // never more than this many images on screen
+const TRAIL_LIFETIME = 900;   // ms for one image to appear + fade out
+
+function ImageTrail({ images, active }) {
+  const layerRef = useRef(null);
+
+  useEffect(() => {
+    const layer = layerRef.current;
+    if (!active || !layer || !images.length) return;
+    const mqFine = window.matchMedia('(hover: hover) and (pointer: fine)');
+    const mqReduce = window.matchMedia('(prefers-reduced-motion: reduce)');
+    if (!mqFine.matches || mqReduce.matches) return;
+
+    // Preload + decode up front so spawning never waits on the network or decoder.
+    const preloaded = images.map((src) => {
+      const i = new Image();
+      i.src = src;
+      if (i.decode) i.decode().catch(() => {});
+      return i;
+    });
+
+    let last = null;         // position of the last spawn
+    let next = 0;            // index of the next image in the sequence
+    const live = new Set();  // currently visible nodes
+
+    const spawn = (x, y) => {
+      const img = document.createElement('img');
+      img.src = preloaded[next].src;
+      img.alt = '';
+      img.draggable = false;
+      img.className = 'trail-img';
+      img.style.left = `${x}px`;
+      img.style.top = `${y}px`;
+      layer.appendChild(img);
+      live.add(img);
+      next = (next + 1) % preloaded.length;
+      const anim = img.animate(
+        [
+          { opacity: 0, transform: 'translate(-50%,-50%) scale(.6)' },
+          { opacity: 1, transform: 'translate(-50%,-50%) scale(1)', offset: 0.2 },
+          { opacity: 0, transform: 'translate(-50%,-50%) scale(.85)' },
+        ],
+        { duration: TRAIL_LIFETIME, easing: 'ease-out', fill: 'forwards' }
+      );
+      const done = () => { live.delete(img); img.remove(); };
+      anim.onfinish = done;
+      anim.oncancel = done;
+    };
+
+    // Handled directly in the event (no rAF hop) so there is no added latency.
+    const onMove = (e) => {
+      const x = e.clientX, y = e.clientY;
+      if (!last) { last = { x, y }; return; }
+      if (Math.hypot(x - last.x, y - last.y) < TRAIL_DISTANCE) return;
+      if (live.size >= TRAIL_MAX_VISIBLE) return;
+      const r = layer.getBoundingClientRect();
+      spawn(x - r.left, y - r.top);
+      last = { x, y };
+    };
+
+    window.addEventListener('pointermove', onMove, { passive: true });
+
+    return () => {
+      window.removeEventListener('pointermove', onMove);
+      live.forEach((n) => n.remove());
+      live.clear();
+    };
+  }, [images, active]);
+
+  return <div className="trail-layer" ref={layerRef} aria-hidden="true" />;
+}
+
 export function About() {
   const [openProject, setOpenProject] = useState(null);
+  const [trailOn, setTrailOn] = useState(false);
+  const projectsRef = useRef(null);
+  const trailImages = TEAM.map((t) => t.img);
+
+  // The trail is only active while the Selected Work panel is on screen.
+  useEffect(() => {
+    const el = projectsRef.current;
+    if (!el || typeof IntersectionObserver === 'undefined') return;
+    const root = el.closest('.page');
+    const io = new IntersectionObserver(
+      ([entry]) => setTrailOn(entry.intersectionRatio > 0.45),
+      { root, threshold: [0, 0.45, 0.6, 1] }
+    );
+    io.observe(el);
+    return () => io.disconnect();
+  }, []);
+
   return (
     <div className="page about-page" data-screen-label="About Us">
+      <ImageTrail images={trailImages} active={trailOn} />
+
       <div className="about-hero">
         <div className="about-grid">
           <div className="about-body">
@@ -859,7 +1081,7 @@ export function About() {
         </div>
       </div>
 
-      <div className="about-projects">
+      <div className="about-projects" ref={projectsRef}>
         <h2 className="page-title about-projects-title">Selected Work</h2>
         <div className="portfolio-list">
           {PORTFOLIO.map((w, i) => (
